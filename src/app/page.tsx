@@ -1,101 +1,142 @@
-import Image from "next/image";
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+	type Course,
+	ITProject,
+	MobileApplication,
+	MobileApplicationLab,
+	SecurityManagement,
+	SecurityManagementLab,
+	WebDev,
+	WebDevLab,
+} from "@/lib/courses";
+import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
+import React from "react";
+
+const dayNames = [
+	"Sunday",
+	"Monday",
+	"Tuesday",
+	"Wednesday",
+	"Thursday",
+	"Friday",
+	"Saturday",
+];
+
+const schedule: { [key: number]: Course[] } = {
+	0: [],
+	1: [MobileApplicationLab],
+	2: [MobileApplication],
+	3: [SecurityManagement, ITProject],
+	4: [],
+	5: [SecurityManagementLab, WebDev],
+	6: [WebDevLab],
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+	const initialDate = new Date();
+	const [currentDate, setCurrentDate] = React.useState(new Date());
+	const [dayIndex, setDayIndex] = React.useState(new Date().getDay());
+	const [dateAndMonth, setDateAndMonth] = React.useState(
+		formatDate(currentDate),
+	);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+	const scheduleForToday: Course[] = schedule[dayIndex];
+
+	const handlePreviousDay = () => {
+		const previousDate = getPreviousDay(currentDate);
+		setCurrentDate(previousDate);
+		setDayIndex((dayIndex - 1 + 7) % 7);
+		setDateAndMonth(formatDate(previousDate));
+	};
+
+	const handleNextDay = () => {
+		const nextDate = getNextDay(currentDate);
+		setCurrentDate(nextDate);
+		setDayIndex((dayIndex + 1) % 7);
+		setDateAndMonth(formatDate(nextDate));
+	};
+
+	const handleRestoreToday = () => {
+		const today = new Date();
+		setCurrentDate(today);
+		setDayIndex(today.getDay());
+		setDateAndMonth(formatDate(today));
+	};
+
+	const isDateChanged = () =>
+		initialDate.toDateString() !== currentDate.toDateString();
+
+	return (
+		<>
+			<div className="h-screen flex flex-col justify-center items-center">
+				<div className="flex justify-center items-center gap-5 h-[100px]">
+					<Button variant="outline" onClick={handlePreviousDay}>
+						<ChevronLeft />
+					</Button>
+					<h1
+						className={cn(
+							"font-bold text-xl w-[200px] text-center cursor-pointer decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
+							isDateChanged() === true && "text-gray-500",
+						)}
+						onClick={handleRestoreToday}
+					>
+						{dayNames[dayIndex]} - {dateAndMonth}
+					</h1>
+					<Button variant="outline" onClick={handleNextDay}>
+						<ChevronRight />
+					</Button>
+				</div>
+
+				<div className="flex justify-center items-center gap-3 h-[150px] w-[400px] mt-[50px]">
+					{scheduleForToday.length > 0
+						? scheduleForToday.map((course) => (
+								<div
+									key={course.label}
+									className={cn(
+										"flex flex-col justify-center items-center border-black border-4 border-dotted p-3 rounded-lg gap-4 text-center",
+										course.isLab && "border-green-400",
+									)}
+								>
+									<h2 className="font-bold text-xl">{course.label}</h2>
+									<Badge>{course.room}</Badge>
+									<div className="flex gap-3 items-center">
+										{course.timeNotation === "AM" ? (
+											<Sun size={15} />
+										) : (
+											<Moon size={15} />
+										)}
+										<h4 className="font-bold">
+											{course.from} - {course.to}
+										</h4>
+									</div>
+								</div>
+							))
+						: "No course for today"}
+				</div>
+			</div>
+		</>
+	);
 }
+
+const formatDate = (date) => {
+	return date.toLocaleDateString("en-GB", {
+		day: "numeric",
+		month: "numeric",
+	});
+};
+
+const getNextDay = (date) => {
+	const nextDay = new Date(date);
+	nextDay.setDate(date.getDate() + 1);
+	return nextDay;
+};
+
+const getPreviousDay = (date) => {
+	const previousDay = new Date(date);
+	previousDay.setDate(date.getDate() - 1);
+	return previousDay;
+};
