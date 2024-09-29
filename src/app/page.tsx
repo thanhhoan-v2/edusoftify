@@ -122,20 +122,20 @@ export default function Home() {
 	);
 }
 
-const formatDate = (date) => {
+const formatDate = (date: Date) => {
 	return date.toLocaleDateString("en-GB", {
 		day: "numeric",
 		month: "numeric",
 	});
 };
 
-const getNextDay = (date) => {
+const getNextDay = (date: Date) => {
 	const nextDay = new Date(date);
 	nextDay.setDate(date.getDate() + 1);
 	return nextDay;
 };
 
-const getPreviousDay = (date) => {
+const getPreviousDay = (date: Date) => {
 	const previousDay = new Date(date);
 	previousDay.setDate(date.getDate() - 1);
 	return previousDay;
