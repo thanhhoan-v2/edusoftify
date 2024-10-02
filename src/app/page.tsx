@@ -2,39 +2,18 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { Course } from "@/lib/courses";
 import {
-	type Course,
-	ITProject,
-	MobileApplication,
-	MobileApplicationLab,
-	SecurityManagement,
-	SecurityManagementLab,
-	WebDev,
-	WebDevLab,
-} from "@/lib/courses";
-import { cn } from "@/lib/utils";
+	cn,
+	dayNames,
+	formatDate,
+	getNextDay,
+	getPreviousDay,
+	getWeekNumber,
+	schedule,
+} from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
 import React from "react";
-
-const dayNames = [
-	"Sunday",
-	"Monday",
-	"Tuesday",
-	"Wednesday",
-	"Thursday",
-	"Friday",
-	"Saturday",
-];
-
-const schedule: { [key: number]: Course[] } = {
-	0: [],
-	1: [MobileApplicationLab],
-	2: [MobileApplication],
-	3: [SecurityManagement, ITProject],
-	4: [],
-	5: [SecurityManagementLab, WebDev],
-	6: [WebDevLab],
-};
 
 export default function Home() {
 	const initialDate = new Date();
@@ -77,15 +56,21 @@ export default function Home() {
 					<Button variant="outline" onClick={handlePreviousDay}>
 						<ChevronLeft />
 					</Button>
-					<h1
-						className={cn(
-							"font-bold text-xl w-[200px] text-center cursor-pointer decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
-							isDateChanged() === true && "text-gray-500",
-						)}
-						onClick={handleRestoreToday}
-					>
-						{dayNames[dayIndex]} - {dateAndMonth}
-					</h1>
+					<div className="flex items-center gap-1">
+						<div className="flex flex-col justify-center items-center">
+							<h1
+								className={cn(
+									"font-bold text-xl w-[200px] text-center cursor-pointer decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
+									isDateChanged() === true &&
+										"text-gray-500 underline decoration-cyan-800 decoration-wavy underline-offset-2",
+								)}
+								onClick={handleRestoreToday}
+							>
+								{dayNames[dayIndex]} - {dateAndMonth}
+							</h1>
+							<p>Week {getWeekNumber(currentDate)}</p>
+						</div>
+					</div>
 					<Button variant="outline" onClick={handleNextDay}>
 						<ChevronRight />
 					</Button>
@@ -121,22 +106,3 @@ export default function Home() {
 		</>
 	);
 }
-
-const formatDate = (date: Date) => {
-	return date.toLocaleDateString("en-GB", {
-		day: "numeric",
-		month: "numeric",
-	});
-};
-
-const getNextDay = (date: Date) => {
-	const nextDay = new Date(date);
-	nextDay.setDate(date.getDate() + 1);
-	return nextDay;
-};
-
-const getPreviousDay = (date: Date) => {
-	const previousDay = new Date(date);
-	previousDay.setDate(date.getDate() - 1);
-	return previousDay;
-};
