@@ -1,8 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import NavBar from "@/components/ui/NavBar";
 import type { Course } from "@/lib/courses";
 import {
 	cn,
@@ -130,92 +128,102 @@ export default function Home() {
 
 	return (
 		<>
-			<div className="h-screen flex flex-col items-center px-4">
-				<div className="flex flex-col items-center mt-[30px]">
-					<div className="flex items-center">
-						<h1
-							className={cn(
-								"font-bold text-xl text-center mr-2 flex-1 cursor-pointer decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
-								isDateChanged() === true && "text-gray-500",
+			<NavBar />
+			<div className="flex flex-col items-center px-4">
+				<div className="flex flex-col items-center">
+					<div className="flex mt-2 items-center">
+						<div className="indicator">
+							{textValue.length > 0 && (
+								<span className="indicator-item badge badge-primary" />
 							)}
-							onClick={handleRestoreToday}
-						>
-							{dayOfTheWeek} - {dateAndMonth}
-						</h1>
-						{textValue.length > 0 && <CircleAlert color="red" />}
+							<h1
+								className={cn(
+									"font-bold indicator-end text-xl text-center mr-2 flex-1 cursor-pointer decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
+									isDateChanged() === true && "text-gray-500",
+								)}
+								onClick={handleRestoreToday}
+							>
+								{dayOfTheWeek} - {dateAndMonth}
+							</h1>
+						</div>
 					</div>
-					<Badge variant="outline" className="mt-[10px]">
-						Week {getWeekNumber(currentDate)}
-					</Badge>
+					<div className="badge mt-[10px]">
+						<h2>Week {getWeekNumber(currentDate)}</h2>
+					</div>
 				</div>
 
 				<form onSubmit={handleFormSubmit} className="w-full">
-					<Textarea
-						className={cn("mt-[10px] border-2 h-[100px] border-black")}
+					<textarea
+						className={cn(
+							"mt-[10px] w-full border-2 h-[50px] textarea textarea-ghost border-black",
+						)}
 						value={textValue}
 						onChange={(e) => setTextValue(e.target.value)}
 						placeholder={`Notes on ${dayOfTheWeek} ${dateAndMonth}`}
 					/>
-					<div className="flex gap-4 justify-around w-full mt-2 h-[50px]">
+					<div className="flex gap-4 h-[50px] justify-around mt-2">
 						{textValue.length > 0 && (
 							<>
-								<Button
-									variant="outline"
-									className="w-full"
-									onClick={handleDeleteNote}
-								>
+								<button className="btn" onClick={handleDeleteNote}>
 									Discard
-								</Button>
+								</button>
 
 								{isSavingNote ? (
-									<Button disabled>
+									<button className="btn btn-secondary" disabled>
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 										Saving
-									</Button>
+									</button>
 								) : (
-									<Button type="submit" className="w-full">
+									<button type="submit" className="btn btn-primary">
 										Save
-									</Button>
+									</button>
 								)}
 							</>
 						)}
 					</div>
 				</form>
 
-				<div className="flex justify-center items-center flex-col gap-4 h-[50%]">
+				<div className="flex w-full justify-center items-center flex-col gap-4">
 					{scheduleForToday.length > 0
 						? scheduleForToday.map((course) => (
 								<div
 									key={course.label}
-									className={cn(
-										"flex flex-col justify-center items-center border-black w-[300px] border-4 border-dotted p-3 rounded-lg gap-4 text-center",
-										course.isLab && "border-green-400",
-									)}
+									className={cn("card bg-base-100 shadow-xl h-fit")}
 								>
-									<h2 className="font-bold text-xl">{course.label}</h2>
-									<Badge>{course.room}</Badge>
-									<div className="flex gap-3 items-center">
-										{course.timeNotation === "AM" ? (
-											<Sun size={15} />
-										) : (
-											<Moon size={15} />
-										)}
-										<h4 className="font-bold">
-											{course.from} - {course.to}
-										</h4>
+									<div className="card-body">
+										<div className="w-full justify-start flex gap-4">
+											<div className="badge badge-outline badge-primary">
+												{course.room}
+											</div>
+											<div className="badge badge-outline badge-secondary flex gap-3 items-center">
+												{course.timeNotation === "AM" ? (
+													<Sun size={15} />
+												) : (
+													<Moon size={15} />
+												)}
+												<h4 className="font-bold">
+													{course.from} - {course.to}
+												</h4>
+											</div>
+										</div>
+										<h2 className="card-title font-bold text-xl">
+											{course.label}
+										</h2>
 									</div>
 								</div>
 							))
 						: "No course for today"}
 				</div>
 
-				<div className="flex absolute bottom-0 justify-center items-center gap-8 h-[100px]">
-					<Button variant="default" onClick={handlePreviousDay}>
-						<ChevronLeft /> {formatDate(prevDay)}
-					</Button>
-					<Button variant="default" onClick={handleNextDay}>
-						{formatDate(nextDay)} <ChevronRight />
-					</Button>
+				<div className="btm-nav">
+					<button className="" onClick={handlePreviousDay}>
+						<ChevronLeft />
+						<span className="btm-nav-label">{formatDate(prevDay)}</span>
+					</button>
+					<button className="" onClick={handleNextDay}>
+						<ChevronRight />
+						<span className="btm-nav-label">{formatDate(nextDay)}</span>
+					</button>
 				</div>
 			</div>
 		</>
