@@ -35,7 +35,7 @@ const themes = [
 	"sunset",
 ];
 
-export default function NavBar() {
+export default function NavBar({ weekNumber }: { weekNumber: string | null }) {
 	const [currentTheme, setCurrentTheme] = React.useState("light");
 
 	const handleRandomizeTheme = () => {
@@ -48,7 +48,7 @@ export default function NavBar() {
 		<>
 			<div className="navbar bg-base-100">
 				<div className="navbar-start">
-					<div className="drawer">
+					<div className="drawer z-40">
 						<input id="my-drawer" type="checkbox" className="drawer-toggle" />
 						<div className="drawer-content">
 							<label
@@ -89,8 +89,9 @@ export default function NavBar() {
 						</ul>
 					</div>
 				</div>
+
 				<div className="navbar-center">
-					<a className="btn btn-ghost text-xl">TKB</a>
+					<a className="btn btn-ghost text-xl">Week {weekNumber}</a>
 				</div>
 				<div className="navbar-end">
 					<button

@@ -128,7 +128,7 @@ export default function Home() {
 
 	return (
 		<>
-			<NavBar />
+			<NavBar weekNumber={getWeekNumber(currentDate)} />
 			<div className="flex flex-col items-center px-4">
 				<div className="flex flex-col items-center">
 					<div className="flex mt-2 items-center">
@@ -136,7 +136,7 @@ export default function Home() {
 							{textValue.length > 0 && (
 								<span className="indicator-item bg-red-500 badge badge-primary" />
 							)}
-							<h1
+							<p
 								className={cn(
 									"font-bold indicator-end text-xl text-center mr-2 flex-1 cursor-pointer decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
 									isDateChanged() === true && "text-gray-500",
@@ -144,10 +144,7 @@ export default function Home() {
 								onClick={handleRestoreToday}
 							>
 								{dayOfTheWeek} - {dateAndMonth}
-							</h1>
-						</div>
-						<div className="badge mt-[10px]">
-							<h2>Week {getWeekNumber(currentDate)}</h2>
+							</p>
 						</div>
 					</div>
 				</div>
@@ -184,38 +181,42 @@ export default function Home() {
 				</form>
 
 				<div className="flex w-full mt-2 justify-center items-center flex-col gap-4">
-					{scheduleForToday.length > 0
-						? scheduleForToday.map((course) => (
-								<div
-									key={course.label}
-									className={cn(
-										"card bg-base-100 w-full border-2 border-black shadow-xl h-fit",
-										course.isLab && "border-green-400",
-									)}
-								>
-									<div className="card-body w-full">
-										<div className="w-full justify-start flex gap-4">
-											<div className="badge badge-outline badge-primary">
-												{course.room}
-											</div>
-											<div className="badge badge-outline badge-secondary flex gap-3 items-center">
-												{course.timeNotation === "AM" ? (
-													<Sun size={15} />
-												) : (
-													<Moon size={15} />
-												)}
-												<h4 className="font-bold">
-													{course.from} - {course.to}
-												</h4>
-											</div>
+					{scheduleForToday.length > 0 ? (
+						scheduleForToday.map((course) => (
+							<div
+								key={course.label}
+								className={cn(
+									"card bg-base-100 w-full border-2 border-black shadow-xl h-fit",
+									course.isLab && "border-green-400",
+								)}
+							>
+								<div className="card-body w-full">
+									<div className="w-full justify-start flex gap-4">
+										<div className="badge badge-outline badge-primary">
+											{course.room}
 										</div>
-										<h2 className="card-title font-bold text-xl">
-											{course.label}
-										</h2>
+										<div className="badge badge-outline badge-secondary flex gap-3 items-center">
+											{course.timeNotation === "AM" ? (
+												<Sun size={15} />
+											) : (
+												<Moon size={15} />
+											)}
+											<h4 className="font-bold">
+												{course.from} - {course.to}
+											</h4>
+										</div>
 									</div>
+									<h2 className="card-title font-bold text-xl">
+										{course.label}
+									</h2>
 								</div>
-							))
-						: "No course for today"}
+							</div>
+						))
+					) : (
+						<div className="card w-full flex justify-center items-center h-[100px]">
+							<div className="card-title">No course for today</div>
+						</div>
+					)}
 				</div>
 
 				<div className="btm-nav">
