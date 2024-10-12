@@ -134,7 +134,7 @@ export default function Home() {
 					<div className="flex mt-2 items-center">
 						<div className="indicator">
 							{textValue.length > 0 && (
-								<span className="indicator-item badge badge-primary" />
+								<span className="indicator-item bg-red-500 badge badge-primary" />
 							)}
 							<h1
 								className={cn(
@@ -146,22 +146,22 @@ export default function Home() {
 								{dayOfTheWeek} - {dateAndMonth}
 							</h1>
 						</div>
-					</div>
-					<div className="badge mt-[10px]">
-						<h2>Week {getWeekNumber(currentDate)}</h2>
+						<div className="badge mt-[10px]">
+							<h2>Week {getWeekNumber(currentDate)}</h2>
+						</div>
 					</div>
 				</div>
 
 				<form onSubmit={handleFormSubmit} className="w-full">
 					<textarea
 						className={cn(
-							"mt-[10px] w-full border-2 h-[50px] textarea textarea-ghost border-black",
+							"mt-[10px] w-full border-2 h-[40px] textarea textarea-ghost border-black",
 						)}
 						value={textValue}
 						onChange={(e) => setTextValue(e.target.value)}
 						placeholder={`Notes on ${dayOfTheWeek} ${dateAndMonth}`}
 					/>
-					<div className="flex gap-4 h-[50px] justify-around mt-2">
+					<div className="flex gap-4 h-[50px] justify-around mt-1">
 						{textValue.length > 0 && (
 							<>
 								<button className="btn" onClick={handleDeleteNote}>
@@ -183,14 +183,17 @@ export default function Home() {
 					</div>
 				</form>
 
-				<div className="flex w-full justify-center items-center flex-col gap-4">
+				<div className="flex w-full mt-2 justify-center items-center flex-col gap-4">
 					{scheduleForToday.length > 0
 						? scheduleForToday.map((course) => (
 								<div
 									key={course.label}
-									className={cn("card bg-base-100 shadow-xl h-fit")}
+									className={cn(
+										"card bg-base-100 w-full border-2 border-black shadow-xl h-fit",
+										course.isLab && "border-green-400",
+									)}
 								>
-									<div className="card-body">
+									<div className="card-body w-full">
 										<div className="w-full justify-start flex gap-4">
 											<div className="badge badge-outline badge-primary">
 												{course.room}
