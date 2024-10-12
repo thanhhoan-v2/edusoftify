@@ -20,6 +20,7 @@ import {
 	Moon,
 	Sun,
 } from "lucide-react";
+import Head from "next/head";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -128,6 +129,13 @@ export default function Home() {
 
 	return (
 		<>
+			<Head>
+				<meta
+					name="viewport"
+					content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+				/>
+			</Head>
+
 			<NavBar weekNumber={getWeekNumber(currentDate)} />
 			<div className="flex flex-col items-center px-4">
 				<div className="flex flex-col items-center">
