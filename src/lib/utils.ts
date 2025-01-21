@@ -1,13 +1,3 @@
-import {
-	type Course,
-	ITProject,
-	MobileApplication,
-	MobileApplicationLab,
-	SecurityManagement,
-	SecurityManagementLab,
-	WebDev,
-	WebDevLab,
-} from "@/lib/courses";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -16,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const dayNames = [
-	"Sunday",
+	// "Sunday",
 	"Monday",
 	"Tuesday",
 	"Wednesday",
@@ -24,16 +14,6 @@ export const dayNames = [
 	"Friday",
 	"Saturday",
 ];
-
-export const schedule: { [key: number]: Course[] } = {
-	0: [],
-	1: [MobileApplicationLab],
-	2: [MobileApplication],
-	3: [SecurityManagement, ITProject],
-	4: [],
-	5: [SecurityManagementLab, WebDev],
-	6: [WebDevLab],
-};
 
 export const weekRanges = new Map<string, { start: Date; end: Date }>([
 	["01", { start: new Date("2024-09-02"), end: new Date("2024-09-08") }],

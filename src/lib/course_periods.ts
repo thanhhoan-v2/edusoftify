@@ -1,0 +1,18 @@
+export const coursePeriods = [
+	{ label: "Tiết 1", start: "08:00", end: "08:50" },
+	{ label: "Tiết 2", start: "08:50", end: "09:40" },
+	{ label: "Tiết 3", start: "09:40", end: "10:30" },
+	{ label: "Tiết 4", start: "10:35", end: "11:25" },
+	{ label: "Tiết 5", start: "11:25", end: "12:15" },
+	{ label: "Tiết 6", start: "12:15", end: "13:05" },
+	{ label: "Tiết 7", start: "13:15", end: "14:05" },
+	{ label: "Tiết 8", start: "14:05", end: "14:55" },
+	{ label: "Tiết 9", start: "14:55", end: "15:45" },
+	{ label: "Tiết 10", start: "15:50", end: "16:40" },
+	{ label: "Tiết 11", start: "16:40", end: "17:30" },
+	{ label: "Tiết 12", start: "17:30", end: "18:15" },
+	{ label: "Tiết 13", start: "18:15", end: "19:00" },
+	{ label: "Tiết 14", start: "19:00", end: "19:45" },
+	{ label: "Tiết 15", start: "19:55", end: "20:40" },
+	{ label: "Tiết 16", start: "20:40", end: "21:25" },
+];

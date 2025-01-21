@@ -1,42 +1,26 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import { themes } from "@/lib/app-themes";
+import { EDIT_COURSES_PAGE, HOME_PAGE, SIGN_IN_PAGE } from "@/lib/routes";
+import { UserButton, useStackApp } from "@stackframe/stack";
 import { AlignLeft, Shuffle } from "lucide-react";
 import React from "react";
 
-const themes = [
-	"light",
-	"dark",
-	"cupcake",
-	"bumblebee",
-	"emerald",
-	"corporate",
-	"synthwave",
-	"retro",
-	"cyberpunk",
-	"valentine",
-	"halloween",
-	"garden",
-	"forest",
-	"aqua",
-	"lofi",
-	"pastel",
-	"fantasy",
-	"wireframe",
-	"black",
-	"luxury",
-	"dracula",
-	"cmyk",
-	"autumn",
-	"acid",
-	"lemonade",
-	"night",
-	"coffee",
-	"winter",
-	"dim",
-	"nord",
-	"sunset",
-];
+type NavBarProps = {
+	weekNumber?: string | null;
+	title?: string;
+	showAuthButton?: boolean;
+};
 
-export default function NavBar({ weekNumber }: { weekNumber: string | null }) {
+export default function NavBar({
+	weekNumber,
+	title,
+	showAuthButton = true,
+}: NavBarProps) {
 	const [currentTheme, setCurrentTheme] = React.useState("light");
+
+	const app = useStackApp();
+	const user = app.useUser();
 
 	const handleRandomizeTheme = () => {
 		const randomTheme = themes[Math.floor(Math.random() * themes.length)];
@@ -66,10 +50,10 @@ export default function NavBar({ weekNumber }: { weekNumber: string | null }) {
 							/>
 							<ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
 								<li>
-									<a>Sidebar Item 1</a>
+									<a href={HOME_PAGE}>Home</a>
 								</li>
 								<li>
-									<a>Sidebar Item 2</a>
+									<a href={EDIT_COURSES_PAGE}>Edit courses</a>
 								</li>
 							</ul>
 						</div>
@@ -91,15 +75,31 @@ export default function NavBar({ weekNumber }: { weekNumber: string | null }) {
 				</div>
 
 				<div className="navbar-center">
-					<a className="btn btn-ghost text-xl">Week {weekNumber}</a>
+					{weekNumber ? (
+						<a className="btn btn-ghost text-xl">Week {weekNumber}</a>
+					) : (
+						<p className="btn btn-ghost text-xl">{title}</p>
+					)}
 				</div>
-				<div className="navbar-end">
+				<div className="navbar-end gap-4">
 					<button
 						className="btn flex btn-ghost theme-controller"
 						onClick={handleRandomizeTheme}
 					>
 						<Shuffle /> <p>{currentTheme}</p>
 					</button>
+
+					{showAuthButton && (
+						<div>
+							{user ? (
+								<UserButton />
+							) : (
+								<a href={SIGN_IN_PAGE}>
+									<Button>Sign in</Button>
+								</a>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 		</>

@@ -1,7 +1,9 @@
 "use client";
 
+import CourseItem from "@/components/ui/CourseItem";
 import NavBar from "@/components/ui/NavBar";
-import type { Course } from "@/lib/courses";
+import { useToast } from "@/hooks/use-toast";
+import { coursePeriods } from "@/lib/course_periods";
 import {
 	cn,
 	dayNames,
@@ -11,7 +13,11 @@ import {
 	getWeekNumber,
 	schedule,
 } from "@/lib/utils";
+import type { Course } from "@/model/Course";
+import { createSupabaseClient } from "@/utils/supabase-client";
 import { createClient } from "@/utils/supabase/client";
+import { useStackApp, useUser } from "@stackframe/stack";
+import { createBrowserClient } from "@supabase/ssr";
 import {
 	ChevronLeft,
 	ChevronRight,
@@ -22,11 +28,11 @@ import {
 } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function Home() {
 	const supabase = createClient();
-	const router = useRouter();
+	const [courses, setCourses] = React.useState<Course[]>([]);
 
 	const initialDate = new Date();
 	const [currentDate, setCurrentDate] = React.useState(new Date());
@@ -35,73 +41,95 @@ export default function Home() {
 		formatDate(currentDate),
 	);
 
-	const [textValue, setTextValue] = React.useState("");
-	const [fetchedTextValueId, setFetchedTextValueId] = React.useState(null);
-	const [isSavingNote, setNoteSavingStatus] = React.useState(false);
+	const [dayNote, setDayNote] = React.useState("");
+	const [fetchedDayNoteId, setFetchedDayNoteId] = React.useState(null);
+	const [isSavingNote, setDayNoteSavingStatus] = React.useState(false);
 
-	React.useEffect(() => {
-		const fetchData = async () => {
+	const app = useStackApp();
+	const user = app.useUser();
+	const { toast } = useToast();
+
+	useEffect(() => {
+		// Fetch all user's courses based on user's id
+		const fetchUserCoursesViaDayIndex = async () => {
 			const { data, error } = await supabase
-				.from("descriptions")
+				.from("course")
+				.select("*")
+				.eq("user_id", user?.id)
+				.eq("day_index", dayIndex);
+			if (data) {
+				setCourses(data);
+			}
+			if (error)
+				return toast({
+					title: "Failed to get courses",
+					description: error.message,
+				});
+		};
+		fetchUserCoursesViaDayIndex();
+	}, []);
+
+	useEffect(() => {
+		const fetchDayNote = async () => {
+			const { data, error } = await supabase
+				.from("day_notes")
 				.select()
 				.eq("onDate", currentDate.toISOString().slice(0, 10));
 			if (data && data?.length > 0) {
-				setTextValue(data[0]?.value);
-				setFetchedTextValueId(data[0]?.id);
+				setDayNote(data[0]?.value);
+				setFetchedDayNoteId(data[0]?.id);
 			} else {
-				setTextValue("");
-				setFetchedTextValueId(null);
+				setDayNote("");
+				setFetchedDayNoteId(null);
 			}
 		};
-		fetchData();
+		fetchDayNote();
 	}, [currentDate]);
 
-	const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleDayNoteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		setNoteSavingStatus(true);
+		setDayNoteSavingStatus(true);
 
-		if (textValue.length > 0 && fetchedTextValueId) {
+		if (dayNote.length > 0 && fetchedDayNoteId) {
 			// UPDATE existing note
 			const { data, error } = await supabase
-				.from("descriptions")
-				.update({ value: textValue })
-				.eq("id", fetchedTextValueId)
+				.from("day_notes")
+				.update({ value: dayNote })
+				.eq("id", fetchedDayNoteId)
 				.select();
 			if (data) {
-				setNoteSavingStatus(false);
+				setDayNoteSavingStatus(false);
 			}
 		} else {
 			// CREATE new note
 			const { data, error } = await supabase
-				.from("descriptions")
+				.from("day_notes")
 				.insert([
 					{
-						value: textValue,
+						value: dayNote,
 						onDate: currentDate,
 					},
 				])
 				.select();
 			if (data) {
-				setFetchedTextValueId(data[0].id);
-				setNoteSavingStatus(false);
+				setFetchedDayNoteId(data[0].id);
+				setDayNoteSavingStatus(false);
 			}
 		}
 	};
 
-	const handleDeleteNote = async () => {
+	const handleDeleteDayNote = async () => {
 		const { data, error } = await supabase
-			.from("descriptions")
+			.from("day_notes")
 			.delete()
-			.eq("id", fetchedTextValueId);
+			.eq("id", fetchedDayNoteId);
 
-		setTextValue("");
+		setDayNote("");
 	};
 
 	const prevDay = getPreviousDay(currentDate);
 	const nextDay = getNextDay(currentDate);
 	const dayOfTheWeek = dayNames[dayIndex];
-
-	const scheduleForToday: Course[] = schedule[dayIndex];
 
 	const handlePreviousDay = () => {
 		const previousDate = getPreviousDay(currentDate);
@@ -137,11 +165,12 @@ export default function Home() {
 			</Head>
 
 			<NavBar weekNumber={getWeekNumber(currentDate)} />
+
 			<div className="flex flex-col items-center px-4">
 				<div className="flex flex-col items-center">
 					<div className="flex mt-2 items-center">
 						<div className="indicator">
-							{textValue.length > 0 && (
+							{dayNote.length > 0 && (
 								<span className="indicator-item bg-red-500 badge badge-primary" />
 							)}
 							<p
@@ -157,86 +186,65 @@ export default function Home() {
 					</div>
 				</div>
 
-				<form onSubmit={handleFormSubmit} className="w-full">
-					<textarea
-						className={cn(
-							"mt-[10px] w-full border-2 h-[40px] textarea textarea-ghost border-black",
-						)}
-						value={textValue}
-						onChange={(e) => setTextValue(e.target.value)}
-						placeholder={`Notes on ${dayOfTheWeek} ${dateAndMonth}`}
-					/>
-					<div className="flex gap-4 h-[50px] justify-around mt-1">
-						{textValue.length > 0 && (
-							<>
-								<button className="btn" onClick={handleDeleteNote}>
-									Discard
-								</button>
-
-								{isSavingNote ? (
-									<button className="btn btn-secondary" disabled>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-										Saving
-									</button>
-								) : (
-									<button type="submit" className="btn btn-primary">
-										Save
-									</button>
-								)}
-							</>
-						)}
-					</div>
-				</form>
-
-				<div className="flex w-full mt-2 justify-center items-center flex-col gap-4">
-					{scheduleForToday.length > 0 ? (
-						scheduleForToday.map((course) => (
-							<div
-								key={course.label}
+				{user ? (
+					<>
+						<form onSubmit={handleDayNoteSubmit} className="w-full">
+							<textarea
 								className={cn(
-									"card bg-base-100 w-full border-2 border-black shadow-xl h-fit",
-									course.isLab && "border-green-400",
+									"mt-[10px] w-full border-2 h-[40px] textarea textarea-ghost border-black",
 								)}
-							>
-								<div className="card-body w-full">
-									<div className="w-full justify-start flex gap-4">
-										<div className="badge badge-outline badge-primary">
-											{course.room}
-										</div>
-										<div className="badge badge-outline badge-secondary flex gap-3 items-center">
-											{course.timeNotation === "AM" ? (
-												<Sun size={15} />
-											) : (
-												<Moon size={15} />
-											)}
-											<h4 className="font-bold">
-												{course.from} - {course.to}
-											</h4>
-										</div>
-									</div>
-									<h2 className="card-title font-bold text-xl">
-										{course.label}
-									</h2>
-								</div>
-							</div>
-						))
-					) : (
-						<div className="card w-full flex justify-center items-center h-[100px]">
-							<div className="card-title">No course for today</div>
-						</div>
-					)}
-				</div>
+								value={dayNote}
+								onChange={(e) => setDayNote(e.target.value)}
+								placeholder={`Notes on ${dayOfTheWeek} ${dateAndMonth}`}
+							/>
+							<div className="flex gap-4 h-[50px] justify-around mt-1">
+								{dayNote.length > 0 && (
+									<>
+										<button className="btn" onClick={handleDeleteDayNote}>
+											Discard
+										</button>
 
-				<div className="btm-nav">
-					<button className="" onClick={handlePreviousDay}>
-						<ChevronLeft />
-						<span className="btm-nav-label">{formatDate(prevDay)}</span>
-					</button>
-					<button className="" onClick={handleNextDay}>
-						<ChevronRight />
-						<span className="btm-nav-label">{formatDate(nextDay)}</span>
-					</button>
-				</div>
+										{isSavingNote ? (
+											<button className="btn btn-secondary" disabled>
+												<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+												Saving
+											</button>
+										) : (
+											<button type="submit" className="btn btn-primary">
+												Save
+											</button>
+										)}
+									</>
+								)}
+							</div>
+						</form>
+						<div className="flex w-full mt-2 justify-center items-center flex-col gap-4">
+							{courses.length > 0 ? (
+								courses.map((course) => (
+									<CourseItem {...course} key={course.label} />
+								))
+							) : (
+								<div className="card w-full flex justify-center items-center h-[50vh]">
+									<div className="card-title">No course for today</div>
+								</div>
+							)}
+						</div>
+						<div className="btm-nav">
+							<button className="" onClick={handlePreviousDay}>
+								<ChevronLeft />
+								<span className="btm-nav-label">{formatDate(prevDay)}</span>
+							</button>
+							<button className="" onClick={handleNextDay}>
+								<ChevronRight />
+								<span className="btm-nav-label">{formatDate(nextDay)}</span>
+							</button>
+						</div>
+					</>
+				) : (
+					<div className="mt-[100px]">
+						<p>Please sign in</p>
+					</div>
+				)}
 			</div>
 		</>
 	);
