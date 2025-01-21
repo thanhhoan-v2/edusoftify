@@ -6,31 +6,26 @@ import {
 	AlertDialogAction,
 	AlertDialogCancel,
 	AlertDialogContent,
-	AlertDialogDescription,
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Drawer,
-	DrawerClose,
 	DrawerContent,
-	DrawerDescription,
 	DrawerFooter,
 	DrawerHeader,
 	DrawerTitle,
-	DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useToast } from "@/hooks/use-toast";
 import { coursePeriods } from "@/lib/course_periods";
 import { dayNames } from "@/lib/utils";
 import type { Course } from "@/model/Course";
 import { createClient } from "@/utils/supabase/client";
-import { useStackApp, useUser } from "@stackframe/stack";
-import { Minus, Plus, X } from "lucide-react";
-import { type FormEvent, FormEventHandler, useEffect } from "react";
+import { useStackApp } from "@stackframe/stack";
+import { Plus, X } from "lucide-react";
+import { type FormEvent, useEffect } from "react";
 import { useState } from "react";
 
 export default function EditCoursesPage() {
@@ -71,7 +66,7 @@ export default function EditCoursesPage() {
 			});
 		}
 
-		const { data, error } = await supabase.from("course").insert([
+		const { error } = await supabase.from("course").insert([
 			{
 				user_id: user?.id,
 				label: courseLabelValue,
@@ -121,6 +116,11 @@ export default function EditCoursesPage() {
 				.eq("user_id", user?.id);
 
 			if (data) setCourses(data);
+			if (error)
+				return toast({
+					title: "Failed to get courses",
+					description: error.message,
+				});
 		};
 
 		fetchUserCourses();

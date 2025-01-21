@@ -3,7 +3,6 @@
 import CourseItem from "@/components/ui/CourseItem";
 import NavBar from "@/components/ui/NavBar";
 import { useToast } from "@/hooks/use-toast";
-import { coursePeriods } from "@/lib/course_periods";
 import {
 	cn,
 	dayNames,
@@ -11,23 +10,12 @@ import {
 	getNextDay,
 	getPreviousDay,
 	getWeekNumber,
-	schedule,
 } from "@/lib/utils";
 import type { Course } from "@/model/Course";
-import { createSupabaseClient } from "@/utils/supabase-client";
 import { createClient } from "@/utils/supabase/client";
-import { useStackApp, useUser } from "@stackframe/stack";
-import { createBrowserClient } from "@supabase/ssr";
-import {
-	ChevronLeft,
-	ChevronRight,
-	CircleAlert,
-	Loader2,
-	Moon,
-	Sun,
-} from "lucide-react";
+import { useStackApp } from "@stackframe/stack";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Head from "next/head";
-import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 export default function Home() {
@@ -75,6 +63,14 @@ export default function Home() {
 				.from("day_notes")
 				.select()
 				.eq("onDate", currentDate.toISOString().slice(0, 10));
+
+			if (error) {
+				return toast({
+					title: "Failed to get note",
+					description: error.message,
+				});
+			}
+
 			if (data && data?.length > 0) {
 				setDayNote(data[0]?.value);
 				setFetchedDayNoteId(data[0]?.id);
@@ -83,6 +79,7 @@ export default function Home() {
 				setFetchedDayNoteId(null);
 			}
 		};
+
 		fetchDayNote();
 	}, [currentDate]);
 
@@ -97,6 +94,12 @@ export default function Home() {
 				.update({ value: dayNote })
 				.eq("id", fetchedDayNoteId)
 				.select();
+			if (error) {
+				return toast({
+					title: "Failed to update note",
+					description: error.message,
+				});
+			}
 			if (data) {
 				setDayNoteSavingStatus(false);
 			}
@@ -111,6 +114,14 @@ export default function Home() {
 					},
 				])
 				.select();
+
+			if (error) {
+				return toast({
+					title: "Failed to save note",
+					description: error.message,
+				});
+			}
+
 			if (data) {
 				setFetchedDayNoteId(data[0].id);
 				setDayNoteSavingStatus(false);
@@ -119,12 +130,19 @@ export default function Home() {
 	};
 
 	const handleDeleteDayNote = async () => {
-		const { data, error } = await supabase
+		const { error } = await supabase
 			.from("day_notes")
 			.delete()
 			.eq("id", fetchedDayNoteId);
 
 		setDayNote("");
+
+		if (error) {
+			return toast({
+				title: "Failed to delete note",
+				description: error.message,
+			});
+		}
 	};
 
 	const prevDay = getPreviousDay(currentDate);
