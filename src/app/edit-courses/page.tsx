@@ -120,16 +120,16 @@ export default function EditCoursesPage() {
 	const handleUpdateCourseSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		if (courseLabelValue.length < 5) {
+		if (courseLabelValue.length < 3) {
 			return toast({
-				title: "Course name must have at least 5 characters.",
+				title: "Course name must have at least 3 characters.",
 				description: "Please enter a valid course name",
 			});
 		}
 
-		if (courseRoomValue.length < 5) {
+		if (courseRoomValue.length < 3) {
 			return toast({
-				title: "Room number must have at least 4 characters.",
+				title: "Room number must have at least 3 characters.",
 				description: "Please enter a valid room number",
 			});
 		}
@@ -240,9 +240,12 @@ export default function EditCoursesPage() {
 							{/* Group items */}
 							{groupedCourses[Number.parseInt(dayIndex)].map(
 								(course: Course) => (
-									<div className="flex gap-2" key={course.label}>
+									<div
+										className="flex flex-col gap-2 card bg-base-100 w-full border-2 border-black shadow-xl h-fit"
+										key={course.label}
+									>
 										<CourseItem {...course} />
-										<div className="self-center gap-2 flex flex-col">
+										<div className="self-center my-2 gap-2 flex">
 											{/* Delete course button */}
 											<Button
 												variant="default"

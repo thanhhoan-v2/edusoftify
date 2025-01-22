@@ -63,12 +63,14 @@ export default function NavBar({
 										Home
 									</Link>
 								</li>
-								<li>
-									<Link href={EDIT_COURSES_PAGE}>
-										<Settings />
-										Edit courses
-									</Link>
-								</li>
+								{user && (
+									<li>
+										<Link href={EDIT_COURSES_PAGE}>
+											<Settings />
+											Edit courses
+										</Link>
+									</li>
+								)}
 								<li>
 									<Link href={THEME_SETTINGS_PAGE}>
 										<Palette />
