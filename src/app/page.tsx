@@ -51,7 +51,7 @@ export default function Home() {
 	const [isSavingNote, setDayNoteSavingStatus] = React.useState(false);
 
 	useEffect(() => {
-		fetchUserCourses();
+		if (user) fetchUserCourses();
 	}, []);
 
 	// Fetch all user's courses based on user's id
