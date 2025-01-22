@@ -1,9 +1,3 @@
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { coursePeriods } from "@/lib/course_periods";
 import type { Course } from "@/model/Course";
 import { Clock2, MapPin } from "lucide-react";
@@ -13,7 +7,6 @@ export default function CourseItem({
 	room,
 	from_period,
 	to_period,
-	is_lab,
 	note,
 }: Course) {
 	return (
@@ -27,16 +20,18 @@ export default function CourseItem({
 				<div className="card-body w-full">
 					{/* Label */}
 					<h2 className="card-title font-bold text-xl">{label}</h2>
-					<div className="w-full justify-start flex gap-4">
+					<div className="w-full flex-col justify-start flex gap-4">
+						{/* Is lab? */}
+						{room.toUpperCase().startsWith("L") ? (
+							<div className="badge badge-accent">LAB</div>
+						) : (
+							<div className="badge badge-default">THEORY</div>
+						)}
 						{/* Room */}
 						<div className="flex gap-2 items-center">
 							<MapPin />
 							<p>{room.toUpperCase()}</p>
 						</div>
-						{/* Is lab? */}
-						{is_lab && (
-							<div className="badge badge-outline badge-primary">LAB</div>
-						)}
 					</div>
 					{/* From - to periods */}
 					<div className="flex gap-2">
@@ -45,7 +40,7 @@ export default function CourseItem({
 							{/* From period */}
 							<div>
 								<div className="flex items-center gap-2">
-									<p className="badge text-nowrap">
+									<p className="badge badge-primary text-nowrap">
 										{coursePeriods[from_period].label}
 									</p>
 									<p>{coursePeriods[from_period].start}</p>
@@ -57,7 +52,7 @@ export default function CourseItem({
 							{/* To period */}
 							<div>
 								<div className="flex items-center gap-2">
-									<p className="badge text-nowrap">
+									<p className="badge badge-secondary text-nowrap">
 										{coursePeriods[to_period].label}
 									</p>
 									<p>{coursePeriods[to_period].end}</p>

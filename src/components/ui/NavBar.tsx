@@ -1,10 +1,26 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { themes } from "@/lib/app-themes";
-import { EDIT_COURSES_PAGE, HOME_PAGE, SIGN_IN_PAGE } from "@/lib/routes";
+import {
+	EDIT_COURSES_PAGE,
+	HOME_PAGE,
+	SIGN_IN_PAGE,
+	THEME_SETTINGS_PAGE,
+} from "@/lib/routes";
 import { UserButton, useStackApp } from "@stackframe/stack";
-import { AlignLeft, Shuffle } from "lucide-react";
+import {
+	AlignLeft,
+	Brush,
+	Home,
+	Palette,
+	Palmtree,
+	Pen,
+	Settings,
+	Shuffle,
+} from "lucide-react";
+import Link from "next/link";
 import React from "react";
+import { useEffect } from "react";
 
 type NavBarProps = {
 	weekNumber?: string | null;
@@ -17,20 +33,12 @@ export default function NavBar({
 	title,
 	showAuthButton = true,
 }: NavBarProps) {
-	const [currentTheme, setCurrentTheme] = React.useState("light");
-
 	const app = useStackApp();
 	const user = app.useUser();
 
-	const handleRandomizeTheme = () => {
-		const randomTheme = themes[Math.floor(Math.random() * themes.length)];
-		document.documentElement.setAttribute("data-theme", randomTheme);
-		setCurrentTheme(randomTheme);
-	};
-
 	return (
 		<>
-			<div className="navbar bg-base-100">
+			<div className="navbar fixed top-0 right-0 left-0 z-50 flex-between px-3 py-2 shadow-md transition-transform duration-300 ease-in-out bg-base-100">
 				<div className="navbar-start">
 					<div className="drawer z-40">
 						<input id="my-drawer" type="checkbox" className="drawer-toggle" />
@@ -50,27 +58,25 @@ export default function NavBar({
 							/>
 							<ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
 								<li>
-									<a href={HOME_PAGE}>Home</a>
+									<Link href={HOME_PAGE}>
+										<Home />
+										Home
+									</Link>
 								</li>
 								<li>
-									<a href={EDIT_COURSES_PAGE}>Edit courses</a>
+									<Link href={EDIT_COURSES_PAGE}>
+										<Settings />
+										Edit courses
+									</Link>
+								</li>
+								<li>
+									<Link href={THEME_SETTINGS_PAGE}>
+										<Palette />
+										Theme settings
+									</Link>
 								</li>
 							</ul>
 						</div>
-					</div>
-
-					<div className="dropdown">
-						<ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-							<li>
-								<a>Homepage</a>
-							</li>
-							<li>
-								<a>Portfolio</a>
-							</li>
-							<li>
-								<a>About</a>
-							</li>
-						</ul>
 					</div>
 				</div>
 
@@ -82,13 +88,6 @@ export default function NavBar({
 					)}
 				</div>
 				<div className="navbar-end gap-4">
-					<button
-						className="btn flex btn-ghost theme-controller"
-						onClick={handleRandomizeTheme}
-					>
-						<Shuffle /> <p>{currentTheme}</p>
-					</button>
-
 					{showAuthButton && (
 						<div>
 							{user ? (
@@ -102,6 +101,8 @@ export default function NavBar({
 					)}
 				</div>
 			</div>
+
+			<div className="w-[100px] h-[70px]" />
 		</>
 	);
 }
