@@ -242,24 +242,26 @@ export default function Home() {
 				)}
 			</div>
 
-			<div className="chat chat-start mt-4 px-5">
-				<div className="chat-image avatar">
-					<div className="w-10 rounded-full">
-						<img alt="User avatar" src={user?.profileImageUrl ?? ""} />
+			{user && (
+				<div className="chat chat-start mt-4 px-5">
+					<div className="chat-image avatar">
+						<div className="w-10 rounded-full">
+							<img alt="User avatar" src={user?.profileImageUrl ?? ""} />
+						</div>
+					</div>
+					<div className="chat-bubble text-nowrap whitespace-pre-wrap break-words w-full">
+						{dayNote.length > 0
+							? dayNote
+							: "Học hành như cá kho tiêu, kho nhiều thì mặn học nhiều thì ngu."}
+					</div>
+					<div className="chat-footer flex gap-2 mt-2 ml-2 opacity-70">
+						<Button variant="outline" onClick={() => setNoteDrawerOpen(true)}>
+							<Pen size={20} />
+							Edit
+						</Button>
 					</div>
 				</div>
-				<div className="chat-bubble text-nowrap whitespace-pre-wrap break-words w-full">
-					{dayNote.length > 0
-						? dayNote
-						: "Học hành như cá kho tiêu, kho nhiều thì mặn học nhiều thì ngu."}
-				</div>
-				<div className="chat-footer flex gap-2 mt-2 ml-2 opacity-70">
-					<Button variant="outline" onClick={() => setNoteDrawerOpen(true)}>
-						<Pen size={20} />
-						Edit
-					</Button>
-				</div>
-			</div>
+			)}
 
 			{/* Navigation buttons */}
 			<div className="btm-nav">
