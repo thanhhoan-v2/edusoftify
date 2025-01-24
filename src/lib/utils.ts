@@ -1,19 +1,9 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs));
+	return twMerge(clsx(inputs))
 }
-
-export const dayNames = [
-	"Sunday",
-	"Monday",
-	"Tuesday",
-	"Wednesday",
-	"Thursday",
-	"Friday",
-	"Saturday",
-];
 
 export const weekRanges = new Map<string, { start: Date; end: Date }>([
 	["01", { start: new Date("2024-09-02"), end: new Date("2024-09-08") }],
@@ -36,38 +26,38 @@ export const weekRanges = new Map<string, { start: Date; end: Date }>([
 	["18", { start: new Date("2024-12-30"), end: new Date("2025-01-05") }],
 	["19", { start: new Date("2025-01-06"), end: new Date("2025-01-12") }],
 	["20", { start: new Date("2025-01-13"), end: new Date("2025-01-19") }],
-]);
+])
 
 export const formatDate = (date: Date) =>
 	date.toLocaleDateString("en-GB", {
 		day: "numeric",
 		month: "numeric",
-	});
+	})
 
 export const getNextDay = (date: Date) => {
-	const nextDay = new Date(date);
-	nextDay.setDate(date.getDate() + 1);
-	return nextDay;
-};
+	const nextDay = new Date(date)
+	nextDay.setDate(date.getDate() + 1)
+	return nextDay
+}
 
 export const getPreviousDay = (date: Date) => {
-	const previousDay = new Date(date);
-	previousDay.setDate(date.getDate() - 1);
-	return previousDay;
-};
+	const previousDay = new Date(date)
+	previousDay.setDate(date.getDate() - 1)
+	return previousDay
+}
 
 export const getWeekNumber = (date: Date): string | null => {
-	let weekNumber: string | null = null;
-	let previousWeekNumber: string | null = null;
+	let weekNumber: string | null = null
+	let previousWeekNumber: string | null = null
 
 	weekRanges.forEach((range, week) => {
-		if (date >= range.start && date <= range.end) weekNumber = week;
+		if (date >= range.start && date <= range.end) weekNumber = week
 		// Track the previous week number
-		if (date > range.end) previousWeekNumber = week;
-	});
+		if (date > range.end) previousWeekNumber = week
+	})
 
 	// Use the previous week's number if it's Sunday
-	if (date.getDay() === 0 && !weekNumber) weekNumber = previousWeekNumber;
+	if (date.getDay() === 0 && !weekNumber) weekNumber = previousWeekNumber
 
-	return weekNumber;
-};
+	return weekNumber
+}

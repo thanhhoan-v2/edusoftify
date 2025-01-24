@@ -1,44 +1,33 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { themes } from "@/lib/app-themes";
+"use client"
+import { Button } from "@/components/ui/button"
 import {
-	EDIT_COURSES_PAGE,
+	COURSES_PAGE,
 	HOME_PAGE,
+	SEARCH_PAGE,
 	SIGN_IN_PAGE,
 	THEME_SETTINGS_PAGE,
-} from "@/lib/routes";
-import { UserButton, useStackApp } from "@stackframe/stack";
-import {
-	AlignLeft,
-	Brush,
-	Home,
-	Palette,
-	Palmtree,
-	Pen,
-	Settings,
-	Shuffle,
-} from "lucide-react";
-import Link from "next/link";
-import React from "react";
-import { useEffect } from "react";
+} from "@/lib/routes"
+import { UserButton, useStackApp } from "@stackframe/stack"
+import { AlignLeft, Home, Palette, Search, Settings } from "lucide-react"
+import Link from "next/link"
 
 type NavBarProps = {
-	weekNumber?: string | null;
-	title?: string;
-	showAuthButton?: boolean;
-};
+	weekNumber?: string | null
+	title?: string
+	showAuthButton?: boolean
+}
 
 export default function NavBar({
 	weekNumber,
 	title,
 	showAuthButton = true,
 }: NavBarProps) {
-	const app = useStackApp();
-	const user = app.useUser();
+	const app = useStackApp()
+	const user = app.useUser()
 
 	return (
 		<>
-			<div className="navbar fixed top-0 right-0 left-0 z-50 flex-between px-3 py-2 shadow-md transition-transform duration-300 ease-in-out bg-base-100">
+			<div className="navbar fixed top-0 right-0 left-0 z-50 flex-between bg-base-100 px-3 py-2 shadow-md transition-transform duration-300 ease-in-out">
 				<div className="navbar-start">
 					<div className="drawer z-40">
 						<input id="my-drawer" type="checkbox" className="drawer-toggle" />
@@ -56,7 +45,7 @@ export default function NavBar({
 								aria-label="close sidebar"
 								className="drawer-overlay"
 							/>
-							<ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+							<ul className="menu min-h-full w-80 bg-base-200 p-4 text-base-content">
 								<li>
 									<Link href={HOME_PAGE}>
 										<Home />
@@ -65,7 +54,7 @@ export default function NavBar({
 								</li>
 								{user && (
 									<li>
-										<Link href={EDIT_COURSES_PAGE}>
+										<Link href={COURSES_PAGE}>
 											<Settings />
 											Edit courses
 										</Link>
@@ -77,6 +66,12 @@ export default function NavBar({
 										Theme settings
 									</Link>
 								</li>
+								<li>
+									<Link href={SEARCH_PAGE}>
+										<Search />
+										Search
+									</Link>
+								</li>
 							</ul>
 						</div>
 					</div>
@@ -84,7 +79,7 @@ export default function NavBar({
 
 				<div className="navbar-center">
 					{weekNumber ? (
-						<a className="btn btn-ghost text-xl">Week {weekNumber}</a>
+						<p className="btn btn-ghost text-xl">Week {weekNumber}</p>
 					) : (
 						<p className="btn btn-ghost text-xl">{title}</p>
 					)}
@@ -104,7 +99,7 @@ export default function NavBar({
 				</div>
 			</div>
 
-			<div className="w-[100px] h-[70px]" />
+			<div className="h-[70px] w-[100px]" />
 		</>
-	);
+	)
 }

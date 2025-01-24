@@ -1,6 +1,6 @@
-"use client";
-import CourseItem from "@/components/ui/CourseItem";
-import NavBar from "@/components/ui/NavBar";
+"use client"
+import { PageHeader } from "@/components/PageHeader"
+import CourseItem from "@/components/ui/CourseItem"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -9,63 +9,62 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import {
 	Drawer,
 	DrawerContent,
 	DrawerFooter,
 	DrawerHeader,
 	DrawerTitle,
-} from "@/components/ui/drawer";
-import { useToast } from "@/hooks/use-toast";
-import { coursePeriods } from "@/lib/course_periods";
-import { dayNames } from "@/lib/utils";
-import type { Course } from "@/model/Course";
-import { createClient } from "@/utils/supabase/client";
-import { useStackApp } from "@stackframe/stack";
-import { Pen, Plus, RefreshCcw, X } from "lucide-react";
-import { type FormEvent, useEffect } from "react";
-import { useState } from "react";
+} from "@/components/ui/drawer"
+import { useToast } from "@/hooks/use-toast"
+import { coursePeriods } from "@/lib/course_periods"
+import { dayNames } from "@/lib/day-utils"
+import type { Course } from "@/model/Course"
+import { createClient } from "@/utils/supabase/client"
+import { useStackApp } from "@stackframe/stack"
+import { Pen, Plus, X } from "lucide-react"
+import { type FormEvent, useEffect, useState } from "react"
 
-export default function EditCoursesPage() {
-	const [addCourseFormOpen, setOpenAddCourseForm] = useState(false);
-	const [editCourseFormOpen, setOpenEditCourseForm] = useState(false);
-	const [courses, setCourses] = useState<Course[]>([]);
+export default function CoursesPage() {
+	const [addCourseFormOpen, setOpenAddCourseForm] = useState(false)
+	const [editCourseFormOpen, setOpenEditCourseForm] = useState(false)
+	const [courses, setCourses] = useState<Course[]>([])
 
-	const [courseLabelValue, setCourseLabelValue] = useState("");
-	const [courseRoomValue, setCourseRoomValue] = useState("");
-	const [courseDayIndexValue, setCourseDayIndexValue] = useState("");
+	const [courseLabelValue, setCourseLabelValue] = useState("")
+	const [courseRoomValue, setCourseRoomValue] = useState("")
+	const [courseDayIndexValue, setCourseDayIndexValue] = useState("")
 	const [courseFromPeriodValue, setCourseFromPeriodValue] = useState<
 		string | null
-	>(null);
+	>(null)
 	const [courseToPeriodValue, setCourseToPeriodValue] = useState<string | null>(
 		null,
-	);
+	)
 
-	const [alertDialogOpen, setOpenDeleteAlertDialog] = useState(false);
-	const [tempCourse, setTempCourse] = useState<Course | null>(null);
+	const [alertDialogOpen, setOpenDeleteAlertDialog] = useState(false)
+	const [tempCourse, setTempCourse] = useState<Course | null>(null)
 
-	const supabase = createClient();
-	const app = useStackApp();
-	const user = app.useUser();
-	const { toast } = useToast();
+	const supabase = createClient()
+	const app = useStackApp()
+	const user = app.useUser()
+	const { toast } = useToast()
 
 	const handleAddCourseSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+		e.preventDefault()
 
-		if (courseLabelValue.length < 5) {
+		if (courseLabelValue.length < 2) {
 			return toast({
-				title: "Course name must have at least 5 characters.",
+				title: "Tên môn học phải có ít nhất 2 ký tự.",
 				description: "Please enter a valid course name",
-			});
+			})
 		}
 
-		if (courseRoomValue.length < 5) {
+		if (courseRoomValue.length < 2) {
 			return toast({
-				title: "Room number must have at least 4 characters.",
+				title: "Phòng học phải có ít nhất 2 ký tự.",
 				description: "Please enter a valid room number",
-			});
+			})
 		}
 
 		const { error } = await supabase.from("course").insert([
@@ -81,57 +80,57 @@ export default function EditCoursesPage() {
 					: 0,
 				day_index: Number.parseInt(courseDayIndexValue),
 			},
-		]);
+		])
 
-		closeForm();
-		fetchUserCourses();
+		closeForm()
+		fetchUserCourses()
 
 		if (error)
 			return toast({
 				title: "Failed to add course",
 				description: "Server failed due to some error",
-			});
+			})
 		return toast({
 			title: `Added ${courseLabelValue}`,
 			description: "Successfully added the course",
-		});
-	};
+		})
+	}
 
 	const handleDeleteCourse = async () => {
 		const { error } = await supabase
 			.from("course")
 			.delete()
-			.eq("id", tempCourse?.id);
+			.eq("id", tempCourse?.id)
 
 		if (error)
 			return toast({
 				title: "Failed to delete course",
 				description: "Server failed due to some error",
-			});
+			})
 
-		fetchUserCourses();
+		fetchUserCourses()
 
 		return toast({
 			title: `Deleted ${tempCourse?.label}`,
 			description: "Successfully deleted the course",
-		});
-	};
+		})
+	}
 
 	const handleUpdateCourseSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+		e.preventDefault()
 
-		if (courseLabelValue.length < 3) {
+		if (courseLabelValue.length < 2) {
 			return toast({
-				title: "Course name must have at least 3 characters.",
+				title: "Tên môn học phải có ít nhất 2 ký tự.",
 				description: "Please enter a valid course name",
-			});
+			})
 		}
 
-		if (courseRoomValue.length < 3) {
+		if (courseRoomValue.length < 2) {
 			return toast({
-				title: "Room number must have at least 3 characters.",
+				title: "Phòng học phải có ít nhất 2 ký tự.",
 				description: "Please enter a valid room number",
-			});
+			})
 		}
 
 		const { error } = await supabase
@@ -148,69 +147,69 @@ export default function EditCoursesPage() {
 				day_index: Number.parseInt(courseDayIndexValue),
 			})
 			.eq("id", tempCourse?.id)
-			.select();
+			.select()
 
-		fetchUserCourses();
+		fetchUserCourses()
 
 		if (error)
 			return toast({
 				title: "Failed to add course",
 				description: "Server failed due to some error",
-			});
+			})
 
 		toast({
 			title: `Updated ${courseLabelValue}`,
 			description: "Successfully updated the course",
-		});
+		})
 
-		closeForm();
-	};
+		closeForm()
+	}
 
 	useEffect(() => {
-		fetchUserCourses();
-	}, []);
+		fetchUserCourses()
+	}, [])
 
 	const fetchUserCourses = async () => {
 		const { data, error } = await supabase
 			.from("course")
 			.select("*")
-			.eq("user_id", user?.id);
+			.eq("user_id", user?.id)
 
-		if (data) setCourses(data);
+		if (data) setCourses(data)
 		if (error)
 			return toast({
 				title: "Failed to get courses",
 				description: error.message,
-			});
-	};
+			})
+	}
 
 	const closeForm = () => {
-		setCourseLabelValue("");
-		setCourseRoomValue("");
-		setCourseDayIndexValue("");
-		setCourseFromPeriodValue("0");
-		setCourseToPeriodValue("0");
+		setCourseLabelValue("")
+		setCourseRoomValue("")
+		setCourseDayIndexValue("")
+		setCourseFromPeriodValue("0")
+		setCourseToPeriodValue("0")
 
-		setTempCourse(null);
+		setTempCourse(null)
 
-		setOpenAddCourseForm(false);
-		setOpenEditCourseForm(false);
-	};
+		setOpenAddCourseForm(false)
+		setOpenEditCourseForm(false)
+	}
 
 	const groupedCourses = courses.reduce<Record<number, Course[]>>(
 		(acc, course) => {
 			if (!acc[course.day_index]) {
-				acc[course.day_index] = [];
+				acc[course.day_index] = []
 			}
-			acc[course.day_index].push(course);
-			return acc;
+			acc[course.day_index].push(course)
+			return acc
 		},
 		{},
-	);
+	)
 
 	return (
 		<>
-			<NavBar title="Edit Courses" />
+			<PageHeader title="Your courses" />
 
 			{/* <div className="w-screen flex justify-center items-center"> */}
 			{/* 	<Button className="btn btn-active btn-ghost" onClick={fetchUserCourses}> */}
@@ -222,14 +221,14 @@ export default function EditCoursesPage() {
 			<Button
 				variant="default"
 				size="icon"
-				className="fixed bottom-4 right-4 rounded-full shadow-lg"
+				className="fixed right-4 bottom-4 rounded-full shadow-lg"
 				onClick={() => setOpenAddCourseForm(true)}
 			>
 				<Plus className="h-4 w-4" />
 				<span className="sr-only">Open edit drawer</span>
 			</Button>
 
-			<div className="flex flex-col gap-4 mt-4 p-4">
+			<div className="mt-4 flex flex-col gap-4 p-4">
 				{courses.length > 0 ? (
 					Object.keys(groupedCourses).map((dayIndex) => (
 						<div key={dayIndex} className="flex flex-col gap-2">
@@ -238,22 +237,22 @@ export default function EditCoursesPage() {
 								{dayNames[Number.parseInt(dayIndex)]}
 							</h2>
 							{/* Group items */}
-							{groupedCourses[Number.parseInt(dayIndex)].map(
+							{groupedCourses[Number.parseInt(dayIndex)]?.map(
 								(course: Course) => (
 									<div
-										className="flex flex-col gap-2 card bg-base-100 w-full border-2 border-black shadow-xl h-fit"
+										className="card flex h-fit w-full flex-col gap-2 border-2 border-black bg-base-100 shadow-xl"
 										key={course.label}
 									>
 										<CourseItem {...course} />
-										<div className="self-center my-2 gap-2 flex">
+										<div className="my-2 flex gap-2 self-center">
 											{/* Delete course button */}
 											<Button
 												variant="default"
 												size="icon"
 												className="rounded-full p-2 shadow-lg"
 												onClick={() => {
-													setTempCourse(course);
-													setOpenDeleteAlertDialog(true);
+													setTempCourse(course)
+													setOpenDeleteAlertDialog(true)
 												}}
 											>
 												<X />
@@ -264,15 +263,15 @@ export default function EditCoursesPage() {
 												size="icon"
 												className="rounded-full p-2 shadow-lg"
 												onClick={() => {
-													setTempCourse(course);
-													setCourseLabelValue(course.label);
-													setCourseRoomValue(course.room);
-													setCourseDayIndexValue(course.day_index.toString());
+													setTempCourse(course)
+													setCourseLabelValue(course.label)
+													setCourseRoomValue(course.room)
+													setCourseDayIndexValue(course.day_index.toString())
 													setCourseFromPeriodValue(
 														course.from_period.toString(),
-													);
-													setCourseToPeriodValue(course.to_period.toString());
-													setOpenEditCourseForm(true);
+													)
+													setCourseToPeriodValue(course.to_period.toString())
+													setOpenEditCourseForm(true)
 												}}
 											>
 												<Pen />
@@ -284,7 +283,7 @@ export default function EditCoursesPage() {
 						</div>
 					))
 				) : (
-					<div className="w-screen h-[70vh] flex justify-center items-center">
+					<div className="flex h-[70vh] w-screen items-center justify-center">
 						<div>No courses added</div>
 					</div>
 				)}
@@ -335,7 +334,9 @@ export default function EditCoursesPage() {
 									Học ngày nào ?
 								</option>
 								{dayNames.map((day, index) => (
-									<option value={index}>{day}</option>
+									<option key={day + index.toString()} value={index}>
+										{day}
+									</option>
 								))}
 							</select>
 
@@ -350,7 +351,7 @@ export default function EditCoursesPage() {
 									Từ tiết mấy ?
 								</option>
 								{coursePeriods.map((period, index) => (
-									<option value={index}>
+									<option key={period.label + period.start} value={index}>
 										{period.label} - {period.start}
 									</option>
 								))}
@@ -367,7 +368,7 @@ export default function EditCoursesPage() {
 								{coursePeriods
 									.slice(1, coursePeriods.length)
 									.map((period, index) => (
-										<option value={index}>
+										<option key={period.label + period.end} value={index}>
 											{period.label} - {period.end}
 										</option>
 									))}
@@ -390,7 +391,7 @@ export default function EditCoursesPage() {
 							className="flex flex-col gap-4"
 							onSubmit={handleUpdateCourseSubmit}
 						>
-							{/* Course's name */}
+							{/* Course's name edit */}
 							<label className="input input-bordered flex items-center gap-2">
 								Name
 								<input
@@ -402,7 +403,7 @@ export default function EditCoursesPage() {
 									placeholder="Tên của môn học"
 								/>
 							</label>
-							{/* Course's room */}
+							{/* Course's room edit */}
 							<label className="input input-bordered flex items-center gap-2">
 								Room
 								<input
@@ -414,7 +415,7 @@ export default function EditCoursesPage() {
 									placeholder="Phòng của môn học"
 								/>
 							</label>
-							{/* Course's day index */}
+							{/* Course's day index edit */}
 							<select
 								required
 								className="select select-bordered w-full"
@@ -425,11 +426,13 @@ export default function EditCoursesPage() {
 									Học ngày nào ?
 								</option>
 								{dayNames.map((day, index) => (
-									<option value={index}>{day}</option>
+									<option key={day + index.toString()} value={index}>
+										{day}
+									</option>
 								))}
 							</select>
 
-							{/* Course's from period */}
+							{/* Course's from period edit */}
 							<select
 								required
 								className="select select-bordered w-full"
@@ -440,12 +443,12 @@ export default function EditCoursesPage() {
 									Từ tiết mấy ?
 								</option>
 								{coursePeriods.map((period, index) => (
-									<option value={index}>
+									<option key={period.label + period.start} value={index}>
 										{period.label} - {period.start}
 									</option>
 								))}
 							</select>
-							{/* Course's to period */}
+							{/* Course's to period edit */}
 							<select
 								className="select select-bordered w-full"
 								value={courseToPeriodValue ?? tempCourse?.to_period}
@@ -455,7 +458,7 @@ export default function EditCoursesPage() {
 									Tới tiết mấy ?
 								</option>
 								{coursePeriods.map((period, index) => (
-									<option value={index}>
+									<option key={period.label + period.end} value={index}>
 										{period.label} - {period.end}
 									</option>
 								))}
@@ -486,5 +489,5 @@ export default function EditCoursesPage() {
 				</AlertDialogContent>
 			</AlertDialog>
 		</>
-	);
+	)
 }

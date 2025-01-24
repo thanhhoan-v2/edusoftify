@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
 
 const config: Config = {
 	darkMode: ["class"],
@@ -7,55 +7,29 @@ const config: Config = {
 		"./src/components/**/*.{js,ts,jsx,tsx,mdx}",
 		"./src/app/**/*.{js,ts,jsx,tsx,mdx}",
 	],
-	daisyui: {
-		themes: [
-			"light",
-			"dark",
-			"cupcake",
-			"bumblebee",
-			"emerald",
-			"corporate",
-			"synthwave",
-			"retro",
-			"cyberpunk",
-			"valentine",
-			"halloween",
-			"garden",
-			"forest",
-			"aqua",
-			"lofi",
-			"pastel",
-			"fantasy",
-			"wireframe",
-			"black",
-			"luxury",
-			"dracula",
-			"cmyk",
-			"autumn",
-			"business",
-			"acid",
-			"lemonade",
-			"night",
-			"coffee",
-			"winter",
-			"dim",
-			"nord",
-			"sunset",
-		],
-	},
 	theme: {
-		extend: {
-			colors: {
-				background: "var(--background)",
-				foreground: "var(--foreground)",
-			},
-			borderRadius: {
-				lg: "var(--radius)",
-				md: "calc(var(--radius) - 2px)",
-				sm: "calc(var(--radius) - 4px)",
-			},
-		},
-	},
-	plugins: [require("tailwindcss-animate"), require("daisyui")],
-};
-export default config;
+    	extend: {
+    		colors: {
+    			background: 'var(--background)',
+    			foreground: 'var(--foreground)',
+    			sidebar: {
+    				DEFAULT: 'hsl(var(--sidebar-background))',
+    				foreground: 'hsl(var(--sidebar-foreground))',
+    				primary: 'hsl(var(--sidebar-primary))',
+    				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+    				accent: 'hsl(var(--sidebar-accent))',
+    				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+    				border: 'hsl(var(--sidebar-border))',
+    				ring: 'hsl(var(--sidebar-ring))'
+    			}
+    		},
+    		borderRadius: {
+    			lg: 'var(--radius)',
+    			md: 'calc(var(--radius) - 2px)',
+    			sm: 'calc(var(--radius) - 4px)'
+    		}
+    	}
+    },
+	plugins: [require("tailwindcss-animate")],
+}
+export default config
