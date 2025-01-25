@@ -1,15 +1,18 @@
+import { useToast } from "@/hooks/use-toast"
+import type { Course } from "@/model/Course"
+import { createClient } from "@/utils/supabase/client"
 import type React from "react"
 import { useEffect } from "react"
-import { useToast } from "@/hooks/use-toast"
-import { createClient } from "@/utils/supabase/client"
-import type { Course } from "@/model/Course"
 
 interface UserCoursesProps {
 	userId: string
 	setCourses: React.Dispatch<React.SetStateAction<Course[]>>
 }
 
-const UserCourses: React.FC<UserCoursesProps> = ({ userId, setCourses }) => {
+const getUserCoursesById: React.FC<UserCoursesProps> = ({
+	userId,
+	setCourses,
+}) => {
 	const supabase = createClient()
 	const { toast } = useToast()
 
@@ -36,4 +39,4 @@ const UserCourses: React.FC<UserCoursesProps> = ({ userId, setCourses }) => {
 	return null
 }
 
-export default UserCourses
+export default getUserCoursesById

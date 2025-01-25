@@ -1,13 +1,13 @@
-import NavBar from "@/components/ui/NavBar";
-import { SignIn } from "@stackframe/stack";
+import { PageHeader } from "@/components/PageHeader"
+import { SignIn } from "@stackframe/stack"
 
 export default function SignInPage() {
 	return (
 		<>
-			<NavBar title="Sign In" showAuthButton={false} />
-			<div className="flex justify-center items-center w-screen h-[70vh]">
+			<PageHeader title="Sign In" />
+			<div className="flex h-[70vh] w-screen items-center justify-center">
 				<SignIn />
 			</div>
 		</>
-	);
+	)
 }

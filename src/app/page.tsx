@@ -5,22 +5,21 @@ import { PageHeader } from "@/components/PageHeader"
 import UserCourses from "@/components/UserCourses"
 import { ChatBubble } from "@/components/chat-bubble"
 import CourseItem from "@/components/ui/CourseItem"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { dayNames } from "@/lib/day-utils"
 import { cn, formatDate, getNextDay, getPreviousDay } from "@/lib/utils"
 import type { Course } from "@/model/Course"
+import { createDayNote, updateDayNote } from "@/queries/client/dayNote"
 import { createClient } from "@/utils/supabase/client"
 import { useStackApp } from "@stackframe/stack"
-import { ChevronLeft, ChevronRight, Pen } from "lucide-react"
+import { MoveLeft, MoveRight, Pen } from "lucide-react"
 import Head from "next/head"
 import React, { useEffect } from "react"
 
 export default function HomePage() {
-	const supabase = createClient()
-
 	const app = useStackApp()
+	const supabase = createClient()
 	const user = app.useUser()
 	const { toast } = useToast()
 
@@ -37,6 +36,10 @@ export default function HomePage() {
 	const [dayNote, setDayNote] = React.useState("")
 	const [fetchedDayNoteId, setFetchedDayNoteId] = React.useState(null)
 	const [isSavingNote, setDayNoteSavingStatus] = React.useState(false)
+
+	const prevDay = getPreviousDay(currentDate)
+	const nextDay = getNextDay(currentDate)
+	const dayOfTheWeek = dayNames[dayIndex]
 
 	useEffect(() => {
 		if (user) fetchUserCourses()
@@ -63,11 +66,7 @@ export default function HomePage() {
 		setDayNoteSavingStatus(true)
 
 		if (dayNote.length > 0 && fetchedDayNoteId) {
-			const { data, error } = await supabase
-				.from("day_notes")
-				.update({ value: dayNote })
-				.eq("id", fetchedDayNoteId)
-				.select()
+			const { data, error } = await updateDayNote(dayNote, fetchedDayNoteId)
 			if (error) {
 				return toast({
 					title: "Failed to update note",
@@ -78,19 +77,12 @@ export default function HomePage() {
 				setDayNoteSavingStatus(false)
 			}
 		} else {
-			const { data, error } = await supabase
-				.from("day_notes")
-				.insert([{ value: dayNote, onDate: currentDate }])
-				.select()
+			const { data, error } = await createDayNote(dayNote, currentDate)
 			if (error) {
 				return toast({
 					title: "Failed to save note",
 					description: error.message,
 				})
-			}
-			if (data) {
-				setFetchedDayNoteId(data[0].id)
-				setDayNoteSavingStatus(false)
 			}
 		}
 	}
@@ -100,9 +92,7 @@ export default function HomePage() {
 			.from("day_notes")
 			.delete()
 			.eq("id", fetchedDayNoteId)
-
 		setDayNote("")
-
 		if (error) {
 			return toast({
 				title: "Failed to delete note",
@@ -110,10 +100,6 @@ export default function HomePage() {
 			})
 		}
 	}
-
-	const prevDay = getPreviousDay(currentDate)
-	const nextDay = getNextDay(currentDate)
-	const dayOfTheWeek = dayNames[dayIndex]
 
 	const handlePreviousDay = () => {
 		const previousDate = getPreviousDay(currentDate)
@@ -153,17 +139,14 @@ export default function HomePage() {
 			<div className="flex flex-col items-center px-4">
 				<div className="flex flex-col items-center">
 					<div className="mt-2 flex items-center">
-						<div className="indicator">
-							{dayNote.length > 0 && <Badge className="bg-red-500" />}
-							<div
-								className={cn(
-									"indicator-end mr-2 flex-1 cursor-pointer text-center font-bold text-xl decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
-									isDateChanged() === true && "text-gray-500",
-								)}
-								onClick={handleRestoreToday}
-							>
-								{dayOfTheWeek} - {dateAndMonth}
-							</div>
+						<div
+							className={cn(
+								"my-[30px] mr-2 flex-1 cursor-pointer text-center font-bold text-xl decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
+								isDateChanged() === true && "text-gray-500",
+							)}
+							onClick={handleRestoreToday}
+						>
+							{dayOfTheWeek} - {dateAndMonth}
 						</div>
 					</div>
 				</div>
@@ -186,8 +169,15 @@ export default function HomePage() {
 						</div>
 					</>
 				) : (
-					<div className="mt-[100px]">
-						<p>Please sign in</p>
+					<div className="flex h-[80vh] flex-col items-center justify-center">
+						<div>
+							<h2 className="mt-10 scroll-m-20 border-b pb-2 font-semibold text-3xl tracking-tight transition-colors first:mt-0">
+								Edusoftify
+							</h2>
+							<blockquote className="mt-6 border-l-2 pl-6 italic">
+								Built for Edusoft haters.
+							</blockquote>
+						</div>
 					</div>
 				)}
 			</div>
@@ -210,14 +200,16 @@ export default function HomePage() {
 			<div className="fixed bottom-2 flex w-full justify-around gap-2 p-2">
 				<Button className="w-full" onClick={handlePreviousDay}>
 					<div className="flex items-center self-center">
+						<MoveLeft />
+						&nbsp;
 						<span>{formatDate(prevDay)}</span>
-						<ChevronLeft />
 					</div>
 				</Button>
 				<Button className="w-full" onClick={handleNextDay}>
 					<div className="flex items-center self-center">
 						<span>{formatDate(nextDay)}</span>
-						<ChevronRight />
+						&nbsp;
+						<MoveRight />
 					</div>
 				</Button>
 			</div>

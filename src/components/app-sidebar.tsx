@@ -9,13 +9,8 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 } from "@/components/ui/sidebar"
-import {
-	COURSES_PAGE,
-	HOME_PAGE,
-	SEARCH_PAGE,
-	SETTINGS_PAGE,
-} from "@/lib/routes"
-import { Edit, Home, Search, Settings } from "lucide-react"
+import { HOME_PAGE, SEARCH_PAGE } from "@/lib/routes"
+import { Home, Search } from "lucide-react"
 import Link from "next/link"
 
 const items = [
@@ -25,19 +20,9 @@ const items = [
 		icon: Home,
 	},
 	{
-		title: "Your courses",
-		url: COURSES_PAGE,
-		icon: Edit,
-	},
-	{
 		title: "Search",
 		url: SEARCH_PAGE,
 		icon: Search,
-	},
-	{
-		title: "Settings",
-		url: SETTINGS_PAGE,
-		icon: Settings,
 	},
 ]
 
@@ -45,7 +30,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	return (
 		<Sidebar {...props}>
 			<SidebarHeader>
-				<h1 className="font-bold text-2xl">Edusoftify</h1>
+				<h1 className="font-bold">✨ Edusofity</h1>
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>

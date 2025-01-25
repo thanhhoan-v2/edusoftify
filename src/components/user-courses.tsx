@@ -1,5 +1,4 @@
 "use client"
-import { PageHeader } from "@/components/PageHeader"
 import CourseItem from "@/components/ui/CourseItem"
 import {
 	AlertDialog,
@@ -27,7 +26,7 @@ import { useStackApp } from "@stackframe/stack"
 import { Pen, Plus, X } from "lucide-react"
 import { type FormEvent, useEffect, useState } from "react"
 
-export default function CoursesPage() {
+export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 	const [addCourseFormOpen, setOpenAddCourseForm] = useState(false)
 	const [editCourseFormOpen, setOpenEditCourseForm] = useState(false)
 	const [courses, setCourses] = useState<Course[]>([])
@@ -47,7 +46,6 @@ export default function CoursesPage() {
 
 	const supabase = createClient()
 	const app = useStackApp()
-	const user = app.useUser()
 	const { toast } = useToast()
 
 	const handleAddCourseSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -69,7 +67,7 @@ export default function CoursesPage() {
 
 		const { error } = await supabase.from("course").insert([
 			{
-				user_id: user?.id,
+				user_id: queryUserId,
 				label: courseLabelValue,
 				room: courseRoomValue,
 				from_period: courseFromPeriodValue
@@ -173,7 +171,7 @@ export default function CoursesPage() {
 		const { data, error } = await supabase
 			.from("course")
 			.select("*")
-			.eq("user_id", user?.id)
+			.eq("user_id", queryUserId)
 
 		if (data) setCourses(data)
 		if (error)
@@ -209,8 +207,6 @@ export default function CoursesPage() {
 
 	return (
 		<>
-			<PageHeader title="Your courses" />
-
 			{/* <div className="w-screen flex justify-center items-center"> */}
 			{/* 	<Button className="btn btn-active btn-ghost" onClick={fetchUserCourses}> */}
 			{/* 		<RefreshCcw /> */}
@@ -239,8 +235,9 @@ export default function CoursesPage() {
 							{/* Group items */}
 							{groupedCourses[Number.parseInt(dayIndex)]?.map(
 								(course: Course) => (
+									// Item
 									<div
-										className="card flex h-fit w-full flex-col gap-2 border-2 border-black bg-base-100 shadow-xl"
+										className="card flex h-fit w-full flex-col gap-2 rounded-lg border-2 border-black bg-base-100 shadow-xl"
 										key={course.label}
 									>
 										<CourseItem {...course} />

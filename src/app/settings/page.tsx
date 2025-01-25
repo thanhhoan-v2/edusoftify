@@ -1,12 +1,12 @@
 "use client"
-import NavBar from "@/components/ui/NavBar"
+import { PageHeader } from "@/components/PageHeader"
 import { AccountSettings } from "@stackframe/stack"
 
 export default function SettingsPage() {
 	return (
 		<>
-			<NavBar title="Settings" />
-			<AccountSettings fullPage={false} />
+			<PageHeader title="Settings" />
+			<AccountSettings fullPage={true} />
 		</>
 	)
 }
