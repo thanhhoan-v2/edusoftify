@@ -12,7 +12,7 @@ import {
 import UserCourses from "@/components/user-courses"
 import { createClient } from "@/utils/supabase/client"
 import { useUser } from "@stackframe/stack"
-import { UserPlus, UserX } from "lucide-react"
+import { User, UserPlus, UserX } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface SerializedUser {
@@ -25,8 +25,11 @@ export default function UserProfile({
 	initialUser,
 }: { initialUser: SerializedUser }) {
 	const [isFriend, setIsFriend] = useState<boolean>(false)
+
 	const [bioFormOpen, setBioFormOpen] = useState(false)
 	const [bioValue, setBioValue] = useState<string>("")
+
+	const [noFriends, setNoFriends] = useState<number>(0)
 
 	const user = useUser()
 	const supabase = createClient()
@@ -37,7 +40,19 @@ export default function UserProfile({
 	useEffect(() => {
 		checkExistingFriend()
 		checkExistingBio()
+		fetchFriends()
 	}, [])
+
+	const fetchFriends = async () => {
+		const { data: friends, error } = await supabase
+			.from("friends")
+			.select("*")
+			.or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
+
+		if (friends && friends.length > 0) {
+			setNoFriends(friends.length)
+		}
+	}
 
 	const checkExistingFriend = async () => {
 		const { data: existingFriend } = await supabase
@@ -93,7 +108,7 @@ export default function UserProfile({
 			<div className="flex h-full w-full flex-col p-4">
 				<div className="mt-[20px] flex items-center justify-between gap-5 px-4">
 					<div className="flex flex-col gap-4">
-						<h1 className="text-3xl text-bold">
+						<h1 className="font-bold text-3xl">
 							{initialUser ? initialUser.userName : "Unknown User"}
 						</h1>
 
@@ -110,6 +125,13 @@ export default function UserProfile({
 							<AvatarFallback>{initialUser.userName[0]}</AvatarFallback>
 						</Avatar>
 					</div>
+				</div>
+
+				<div className="mt-[30px] ml-[20px] flex w-max items-center gap-2 hover:cursor-pointer hover:underline hover:decoration-wavy">
+					<User size={19} />
+					<p>
+						{noFriends} friend{noFriends === 1 ? "" : "s"}
+					</p>
 				</div>
 
 				<div className="mt-[30px]">

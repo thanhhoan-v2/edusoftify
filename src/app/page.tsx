@@ -3,6 +3,7 @@
 import DayNoteDrawer from "@/components/DayNoteDrawer"
 import { PageHeader } from "@/components/PageHeader"
 import UserCourses from "@/components/UserCourses"
+import { AnimatedText } from "@/components/animated-text"
 import { ChatBubble } from "@/components/chat-bubble"
 import CourseItem from "@/components/ui/CourseItem"
 import { Button } from "@/components/ui/button"
@@ -137,19 +138,21 @@ export default function HomePage() {
 			<PageHeader title="Home" />
 
 			<div className="flex flex-col items-center px-4">
-				<div className="flex flex-col items-center">
-					<div className="mt-2 flex items-center">
-						<div
-							className={cn(
-								"my-[30px] mr-2 flex-1 cursor-pointer text-center font-bold text-xl decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
-								isDateChanged() === true && "text-gray-500",
-							)}
-							onClick={handleRestoreToday}
-						>
-							{dayOfTheWeek} - {dateAndMonth}
+				{user && (
+					<div className="flex flex-col items-center">
+						<div className="mt-2 flex items-center">
+							<div
+								className={cn(
+									"my-[30px] mr-2 flex-1 cursor-pointer text-center font-bold text-xl decoration-pink-400 underline-offset-4 hover:underline hover:decoration-wavy",
+									isDateChanged() === true && "text-gray-500",
+								)}
+								onClick={handleRestoreToday}
+							>
+								{dayOfTheWeek} - {dateAndMonth}
+							</div>
 						</div>
 					</div>
-				</div>
+				)}
 
 				{user ? (
 					<>
@@ -170,14 +173,7 @@ export default function HomePage() {
 					</>
 				) : (
 					<div className="flex h-[80vh] flex-col items-center justify-center">
-						<div>
-							<h2 className="mt-10 scroll-m-20 border-b pb-2 font-semibold text-3xl tracking-tight transition-colors first:mt-0">
-								Edusoftify
-							</h2>
-							<blockquote className="mt-6 border-l-2 pl-6 italic">
-								Built for Edusoft haters.
-							</blockquote>
-						</div>
+						<AnimatedText title="Edusoftify" subtitle="For Edusoft Haters" />
 					</div>
 				)}
 			</div>
@@ -197,22 +193,24 @@ export default function HomePage() {
 				</div>
 			)}
 
-			<div className="fixed bottom-2 flex w-full justify-around gap-2 p-2">
-				<Button className="w-full" onClick={handlePreviousDay}>
-					<div className="flex items-center self-center">
-						<MoveLeft />
-						&nbsp;
-						<span>{formatDate(prevDay)}</span>
-					</div>
-				</Button>
-				<Button className="w-full" onClick={handleNextDay}>
-					<div className="flex items-center self-center">
-						<span>{formatDate(nextDay)}</span>
-						&nbsp;
-						<MoveRight />
-					</div>
-				</Button>
-			</div>
+			{user && (
+				<div className="fixed bottom-2 flex w-full justify-around gap-2 p-2">
+					<Button className="w-full" onClick={handlePreviousDay}>
+						<div className="flex items-center self-center">
+							<MoveLeft />
+							&nbsp;
+							<span>{formatDate(prevDay)}</span>
+						</div>
+					</Button>
+					<Button className="w-full" onClick={handleNextDay}>
+						<div className="flex items-center self-center">
+							<span>{formatDate(nextDay)}</span>
+							&nbsp;
+							<MoveRight />
+						</div>
+					</Button>
+				</div>
+			)}
 
 			<DayNoteDrawer
 				noteDrawerOpen={noteDrawerOpen}

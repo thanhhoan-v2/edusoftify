@@ -49,7 +49,7 @@ export default function CourseItem({
 		<>
 			<Card
 				key={label}
-				className="h-fit w-full border-2 border-black bg-base-100 p-3 shadow-xl"
+				className="h-fit w-full border-2 border-black bg-base-100 p-3 shadow-2xl"
 			>
 				<CardHeader>
 					{/* Label */}

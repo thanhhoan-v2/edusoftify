@@ -22,7 +22,7 @@ import { coursePeriods } from "@/lib/course_periods"
 import { dayNames } from "@/lib/day-utils"
 import type { Course } from "@/model/Course"
 import { createClient } from "@/utils/supabase/client"
-import { useStackApp } from "@stackframe/stack"
+import { useUser } from "@stackframe/stack"
 import { Pen, Plus, X } from "lucide-react"
 import { type FormEvent, useEffect, useState } from "react"
 
@@ -45,7 +45,7 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 	const [tempCourse, setTempCourse] = useState<Course | null>(null)
 
 	const supabase = createClient()
-	const app = useStackApp()
+	const user = useUser()
 	const { toast } = useToast()
 
 	const handleAddCourseSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -214,15 +214,17 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 			{/* 	</Button> */}
 			{/* </div> */}
 
-			<Button
-				variant="default"
-				size="icon"
-				className="fixed right-4 bottom-4 rounded-full shadow-lg"
-				onClick={() => setOpenAddCourseForm(true)}
-			>
-				<Plus className="h-4 w-4" />
-				<span className="sr-only">Open edit drawer</span>
-			</Button>
+			{user?.id === queryUserId && (
+				<Button
+					variant="default"
+					size="icon"
+					className="fixed right-4 bottom-4 rounded-full shadow-lg"
+					onClick={() => setOpenAddCourseForm(true)}
+				>
+					<Plus className="h-4 w-4" />
+					<span className="sr-only">Open edit drawer</span>
+				</Button>
+			)}
 
 			<div className="mt-4 flex flex-col gap-4 p-4">
 				{courses.length > 0 ? (
@@ -237,43 +239,46 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 								(course: Course) => (
 									// Item
 									<div
-										className="card flex h-fit w-full flex-col gap-2 rounded-lg border-2 border-black bg-base-100 shadow-xl"
+										className="flex h-fit w-full flex-col gap-2 rounded-lg border-2 border-black bg-base-100 p-3 shadow-xl"
+										hidden={user?.id !== queryUserId}
 										key={course.label}
 									>
 										<CourseItem {...course} />
-										<div className="my-2 flex gap-2 self-center">
-											{/* Delete course button */}
-											<Button
-												variant="default"
-												size="icon"
-												className="rounded-full p-2 shadow-lg"
-												onClick={() => {
-													setTempCourse(course)
-													setOpenDeleteAlertDialog(true)
-												}}
-											>
-												<X />
-											</Button>
-											{/* Edit course button */}
-											<Button
-												variant="default"
-												size="icon"
-												className="rounded-full p-2 shadow-lg"
-												onClick={() => {
-													setTempCourse(course)
-													setCourseLabelValue(course.label)
-													setCourseRoomValue(course.room)
-													setCourseDayIndexValue(course.day_index.toString())
-													setCourseFromPeriodValue(
-														course.from_period.toString(),
-													)
-													setCourseToPeriodValue(course.to_period.toString())
-													setOpenEditCourseForm(true)
-												}}
-											>
-												<Pen />
-											</Button>
-										</div>
+										{user?.id === queryUserId && (
+											<div className="my-2 flex justify-around gap-2">
+												{/* Delete course button */}
+												<Button
+													variant="default"
+													size="icon"
+													className="rounded-full p-2 shadow-lg"
+													onClick={() => {
+														setTempCourse(course)
+														setOpenDeleteAlertDialog(true)
+													}}
+												>
+													<X />
+												</Button>
+												{/* Edit course button */}
+												<Button
+													variant="default"
+													size="icon"
+													className="rounded-full p-2 shadow-lg"
+													onClick={() => {
+														setTempCourse(course)
+														setCourseLabelValue(course.label)
+														setCourseRoomValue(course.room)
+														setCourseDayIndexValue(course.day_index.toString())
+														setCourseFromPeriodValue(
+															course.from_period.toString(),
+														)
+														setCourseToPeriodValue(course.to_period.toString())
+														setOpenEditCourseForm(true)
+													}}
+												>
+													<Pen />
+												</Button>
+											</div>
+										)}
 									</div>
 								),
 							)}

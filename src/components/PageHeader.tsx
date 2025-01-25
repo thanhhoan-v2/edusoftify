@@ -41,14 +41,18 @@ export const PageHeader = ({ title }: { title: string }) => {
 	return (
 		<>
 			<header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
-				<Link href={SEARCH_PAGE}>
-					<Button variant="ghost">
-						<Search />
-					</Button>
-				</Link>
+				{user && (
+					<Link href={SEARCH_PAGE}>
+						<Button variant="ghost">
+							<Search />
+						</Button>
+					</Link>
+				)}
 
 				<Link href={HOME_PAGE}>
-					<h1>Edusoftify</h1>
+					<div className="rounded-lg border-2 bg-black p-2 text-white">
+						<h1 className="font-bold">Edusoftify</h1>
+					</div>
 				</Link>
 
 				<div>
