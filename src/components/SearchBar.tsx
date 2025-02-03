@@ -16,7 +16,7 @@ interface SearchBarProps {
 type User = {
 	id: string
 	userName: string
-	avatarUrl: string
+	userAvatarUrl: string
 }
 
 export default function SearchBar({
@@ -113,7 +113,7 @@ export default function SearchBar({
 							<div className="flex items-center justify-between rounded-lg bg-gray-200 p-4">
 								<div className="flex items-center gap-4">
 									<Avatar>
-										<AvatarImage src={searchResult.avatarUrl ?? ""} />
+										<AvatarImage src={searchResult.userAvatarUrl ?? ""} />
 										<AvatarFallback>{searchResult.userName[0]}</AvatarFallback>
 									</Avatar>
 									<span>{searchResult?.userName}</span>
