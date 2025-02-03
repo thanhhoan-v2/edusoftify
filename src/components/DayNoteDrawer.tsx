@@ -1,15 +1,15 @@
-import type React from "react"
+import { Button } from "@/components/ui/button"
 import {
 	Drawer,
+	DrawerClose,
 	DrawerContent,
+	DrawerDescription,
 	DrawerFooter,
 	DrawerHeader,
 	DrawerTitle,
-	DrawerDescription,
-	DrawerClose,
 } from "@/components/ui/drawer"
-import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
+import type React from "react"
 
 interface DayNoteDrawerProps {
 	noteDrawerOpen: boolean
@@ -46,7 +46,7 @@ const DayNoteDrawer: React.FC<DayNoteDrawerProps> = ({
 				<DrawerFooter>
 					<form onSubmit={handleDayNoteSubmit} className="w-full">
 						<textarea
-							className="textarea textarea-ghost mt-[10px] h-[60vh] w-full border-2 border-black"
+							className="textarea textarea-ghost mt-[10px] h-[60vh] w-full"
 							value={dayNote}
 							onChange={(e) => setDayNote(e.target.value)}
 							placeholder={`Notes on ${dayOfTheWeek} ${dateAndMonth}`}

@@ -9,7 +9,9 @@ import {
 import { coursePeriods } from "@/lib/course_periods"
 import { cn } from "@/lib/utils"
 import type { Course } from "@/model/Course"
-import { MapPin, Timer, TimerOff } from "lucide-react"
+import { createClient } from "@/utils/supabase/client"
+import { MapPin, Timer, TimerOff, Users } from "lucide-react"
+import React, { useEffect } from "react"
 import Balancer from "react-wrap-balancer"
 
 export default function CourseItem({
@@ -17,8 +19,33 @@ export default function CourseItem({
 	room,
 	from_period,
 	to_period,
+	day_index,
 	note,
 }: Course) {
+	const [userIds, setUserIds] = React.useState<string[]>([])
+	const [openCommonLearnersModal, setOpenCommonLearnersModal] =
+		React.useState(false)
+
+	const supabase = createClient()
+
+	useEffect(() => {
+		const fetchUserIdByCourseLabel = async () => {
+			const { data: userIds } = await supabase
+				.from("course")
+				.select("*")
+				.eq("label", label)
+				.eq("day_index", day_index)
+			// .select("user_id")
+
+			console.log(userIds)
+
+			// if (userIds) setUserIds(userIds)
+		}
+		fetchUserIdByCourseLabel()
+	}, [])
+
+	console.log(userIds)
+
 	const getRoomPlace = (room: string) => {
 		const roomValue = room.toUpperCase()
 		switch (true) {
@@ -69,7 +96,7 @@ export default function CourseItem({
 						</div>
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="w-full">
+				<CardContent className="flex w-full flex-col gap-2">
 					{/* Room */}
 					<div className="flex items-center gap-2">
 						<MapPin />
@@ -86,14 +113,30 @@ export default function CourseItem({
 
 					{/* To period */}
 					<div className="flex items-center gap-2">
-						<TimerOff />
+						<TimerOff />{" "}
 						<Badge className="text-nowrap border-black font-bold">
 							{coursePeriods[to_period].label}
 						</Badge>
 						<div>{coursePeriods[to_period].end}</div>
 					</div>
+
+					<div
+						className="flex cursor-pointer items-center gap-2"
+						onClick={() => setOpenCommonLearnersModal(true)}
+					>
+						<Users />
+						<p>{userIds} người học chung</p>
+					</div>
 				</CardContent>
 			</Card>
+			{/* <Dialog */}
+			{/* 	open={openCommonLearnersModal} */}
+			{/* 	onOpenChange={setOpenCommonLearnersModal} */}
+			{/* > */}
+			{/* 	<DialogContent className="w-[300px] rounded-lg"> */}
+			{/* 		<CommonLearnersList userIds={userIds} /> */}
+			{/* 	</DialogContent> */}
+			{/* </Dialog> */}
 		</>
 	)
 }

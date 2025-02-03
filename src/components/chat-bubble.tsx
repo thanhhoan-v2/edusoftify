@@ -9,8 +9,8 @@ interface ChatBubbleProps {
 
 export function ChatBubble({ message, avatarUrl, children }: ChatBubbleProps) {
 	return (
-		<div className="mb-4 flex items-center">
-			<Avatar className="h-8 w-8">
+		<div className="mb-4 flex items-end">
+			<Avatar className="mb-1 h-8 w-8">
 				<AvatarImage src={avatarUrl ?? ""} alt="User avatar" />
 				<AvatarFallback>you</AvatarFallback>
 			</Avatar>

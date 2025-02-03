@@ -162,7 +162,11 @@ export default function HomePage() {
 								courses
 									.filter((course) => course.day_index === dayIndex)
 									.map((course) => (
-										<CourseItem {...course} key={course.label} />
+										<CourseItem
+											{...course}
+											day_index={dayIndex}
+											key={course.label}
+										/>
 									))
 							) : (
 								<div className="card flex h-[50vh] w-full items-center justify-center">
@@ -179,15 +183,14 @@ export default function HomePage() {
 			</div>
 
 			{user && (
-				<div className="mt-[40px] ml-[20px]">
+				<div className="mt-[40px] mb-[100px] ml-[20px]">
 					<ChatBubble message={dayNote} avatarUrl={user?.profileImageUrl}>
 						<Button
 							className="mt-3"
-							variant="ghost"
+							variant="outline"
 							onClick={() => setNoteDrawerOpen(true)}
 						>
 							<Pen size={20} />
-							Edit
 						</Button>
 					</ChatBubble>
 				</div>

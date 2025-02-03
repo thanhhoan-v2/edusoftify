@@ -4,8 +4,6 @@ import localFont from "next/font/local"
 import { stackServerApp } from "../stack"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
 
 const geistSans = localFont({
 	src: "./fonts/GeistVF.woff",
@@ -35,10 +33,11 @@ export default function RootLayout({
 			>
 				<StackProvider app={stackServerApp}>
 					<StackTheme>
-						<SidebarProvider>
-							<AppSidebar />
-							<SidebarInset>{children}</SidebarInset>
-						</SidebarProvider>
+						{children}
+						{/* <SidebarProvider> */}
+						{/* 	<AppSidebar /> */}
+						{/* 	<SidebarInset>{children}</SidebarInset> */}
+						{/* </SidebarProvider> */}
 					</StackTheme>
 					<Toaster />
 				</StackProvider>

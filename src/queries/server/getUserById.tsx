@@ -1,4 +1,5 @@
 "use server"
+
 import { stackServerApp } from "@/stack"
 
 export async function getUserById(userId?: string) {
@@ -7,7 +8,7 @@ export async function getUserById(userId?: string) {
 		return {
 			id: user?.id ?? "",
 			userName: user?.displayName ?? "",
-			avatarUrl: user?.profileImageUrl ?? "",
+			userAvatarUrl: user?.profileImageUrl ?? "",
 		}
 	}
 	console.log("[USER] Missing userId when fetching user")
