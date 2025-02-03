@@ -1,4 +1,5 @@
 "use client"
+import UserCourses from "@/components/UserCourses"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,7 +10,6 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from "@/components/ui/drawer"
-import UserCourses from "@/components/user-courses"
 import { createClient } from "@/utils/supabase/client"
 import { useUser } from "@stackframe/stack"
 import { User, UserPlus, UserX } from "lucide-react"

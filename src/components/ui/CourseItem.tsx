@@ -7,7 +7,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card"
 import { coursePeriods } from "@/lib/course_periods"
-import { cn } from "@/lib/utils"
 import type { Course } from "@/model/Course"
 import { createClient } from "@/utils/supabase/client"
 import { MapPin, Timer, TimerOff, Users } from "lucide-react"
@@ -21,6 +20,7 @@ export default function CourseItem({
 	to_period,
 	day_index,
 	note,
+	time_notation,
 }: Course) {
 	const [userIds, setUserIds] = React.useState<string[]>([])
 	const [openCommonLearnersModal, setOpenCommonLearnersModal] =
@@ -35,16 +35,9 @@ export default function CourseItem({
 				.select("*")
 				.eq("label", label)
 				.eq("day_index", day_index)
-			// .select("user_id")
-
-			console.log(userIds)
-
-			// if (userIds) setUserIds(userIds)
 		}
 		fetchUserIdByCourseLabel()
 	}, [])
-
-	console.log(userIds)
 
 	const getRoomPlace = (room: string) => {
 		const roomValue = room.toUpperCase()
@@ -84,16 +77,24 @@ export default function CourseItem({
 						<Balancer>{label}</Balancer>
 					</CardTitle>
 					<CardDescription>
-						<div className="flex w-full flex-col justify-start gap-4">
-							<div
-								className={cn(
-									"font-semibold underline decoration-wavy",
-									getRoomClassName(room),
-								)}
-							>
-								Học tại {getRoomPlace(room)}
-							</div>
-						</div>
+						{/* <div className="flex w-full gap-4"> */}
+						{/* 	<div */}
+						{/* 		className={cn( */}
+						{/* 			"font-semibold underline decoration-wavy", */}
+						{/* 			getRoomClassName(room), */}
+						{/* 		)} */}
+						{/* 	> */}
+						{/* 		Học tại {getRoomPlace(room)} */}
+						{/* 	</div> */}
+						{/* </div> */}
+						<Badge
+							variant={time_notation === "AM" ? "default" : "secondary"}
+							className={
+								time_notation === "AM" ? "bg-yellow-500" : "bg-blue-300"
+							}
+						>
+							{time_notation === "AM" ? "Sáng" : "Chiều"}
+						</Badge>
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="flex w-full flex-col gap-2">
@@ -125,18 +126,10 @@ export default function CourseItem({
 						onClick={() => setOpenCommonLearnersModal(true)}
 					>
 						<Users />
-						<p>{userIds} người học chung</p>
+						<p>{userIds.length} người học chung</p>
 					</div>
 				</CardContent>
 			</Card>
-			{/* <Dialog */}
-			{/* 	open={openCommonLearnersModal} */}
-			{/* 	onOpenChange={setOpenCommonLearnersModal} */}
-			{/* > */}
-			{/* 	<DialogContent className="w-[300px] rounded-lg"> */}
-			{/* 		<CommonLearnersList userIds={userIds} /> */}
-			{/* 	</DialogContent> */}
-			{/* </Dialog> */}
 		</>
 	)
 }

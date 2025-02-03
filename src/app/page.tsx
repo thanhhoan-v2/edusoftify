@@ -2,9 +2,9 @@
 
 import DayNoteDrawer from "@/components/DayNoteDrawer"
 import { PageHeader } from "@/components/PageHeader"
-import UserCourses from "@/components/UserCourses"
 import { AnimatedText } from "@/components/animated-text"
 import { ChatBubble } from "@/components/chat-bubble"
+import UserCourses from "@/components/getUserCoursesById"
 import CourseItem from "@/components/ui/CourseItem"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
