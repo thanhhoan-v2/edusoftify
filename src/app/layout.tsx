@@ -1,5 +1,5 @@
 import { StackProvider, StackTheme } from "@stackframe/stack"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 import { stackServerApp } from "../stack"
 import "./globals.css"
@@ -18,7 +18,13 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
 	title: "Edusoftify",
-	description: "TKB for Thanh Hoan",
+	description: "Edusoft for laziers.",
+}
+
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
 }
 
 export default function RootLayout({

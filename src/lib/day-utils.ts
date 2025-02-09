@@ -7,3 +7,5 @@ export const dayNames = [
 	"Thứ Sáu",
 	"Thứ Bảy",
 ]
+
+export const shortenDayNames = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]

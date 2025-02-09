@@ -8,7 +8,7 @@ import UserCourses from "@/components/getUserCoursesById"
 import CourseItem from "@/components/ui/CourseItem"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { dayNames } from "@/lib/day-utils"
+import { dayNames, shortenDayNames } from "@/lib/day-utils"
 import { cn, formatDate, getNextDay, getPreviousDay } from "@/lib/utils"
 import type { Course } from "@/model/Course"
 import { createDayNote, updateDayNote } from "@/queries/client/dayNote"
@@ -40,7 +40,7 @@ export default function HomePage() {
 
 	const prevDay = getPreviousDay(currentDate)
 	const nextDay = getNextDay(currentDate)
-	const dayOfTheWeek = dayNames[dayIndex]
+	const dayName = dayNames[dayIndex]
 
 	useEffect(() => {
 		if (user) fetchUserCourses()
@@ -148,7 +148,7 @@ export default function HomePage() {
 								)}
 								onClick={handleRestoreToday}
 							>
-								{dayOfTheWeek} - {dateAndMonth}
+								{dayName} - {dateAndMonth}
 							</div>
 						</div>
 					</div>
@@ -202,12 +202,18 @@ export default function HomePage() {
 						<div className="flex items-center self-center">
 							<MoveLeft />
 							&nbsp;
-							<span>{formatDate(prevDay)}</span>
+							<span>
+								{shortenDayNames[(dayIndex + 6) % 7]},&nbsp;
+								{formatDate(prevDay)}
+							</span>
 						</div>
 					</Button>
 					<Button className="w-full" onClick={handleNextDay}>
 						<div className="flex items-center self-center">
-							<span>{formatDate(nextDay)}</span>
+							<span>
+								{shortenDayNames[(dayIndex + 1) % 7]},&nbsp;
+								{formatDate(nextDay)}
+							</span>
 							&nbsp;
 							<MoveRight />
 						</div>
@@ -223,7 +229,7 @@ export default function HomePage() {
 				isSavingNote={isSavingNote}
 				handleDayNoteSubmit={handleDayNoteSubmit}
 				handleDeleteDayNote={handleDeleteDayNote}
-				dayOfTheWeek={dayOfTheWeek}
+				dayOfTheWeek={dayName}
 				dateAndMonth={dateAndMonth}
 			/>
 		</>

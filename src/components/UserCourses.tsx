@@ -1,32 +1,10 @@
 "use client"
+import AddCourseDialog from "@/components/dialogs/AddCourseDialog"
+import DeleteCourseDialog from "@/components/dialogs/DeleteCourseDialog"
+import EditCourseDialog from "@/components/dialogs/EditCourseDialog"
 import CourseItem from "@/components/ui/CourseItem"
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { coursePeriods } from "@/lib/course_periods"
 import { dayNames } from "@/lib/day-utils"
 import type { Course } from "@/model/Course"
 import { createClient } from "@/utils/supabase/client"
@@ -35,10 +13,14 @@ import { Pen, Plus, X } from "lucide-react"
 import { type FormEvent, useEffect, useState } from "react"
 
 export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
+	// Form & Dialog states
 	const [addCourseFormOpen, setOpenAddCourseForm] = useState(false)
 	const [editCourseFormOpen, setOpenEditCourseForm] = useState(false)
-	const [courses, setCourses] = useState<Course[]>([])
+	const [alertDialogOpen, setOpenDeleteAlertDialog] = useState(false)
 
+	// Course value states
+	const [courses, setCourses] = useState<Course[]>([])
+	const [tempCourse, setTempCourse] = useState<Course | null>(null)
 	const [courseLabelValue, setCourseLabelValue] = useState("")
 	const [courseRoomValue, setCourseRoomValue] = useState("")
 	const [courseDayIndexValue, setCourseDayIndexValue] = useState("")
@@ -49,12 +31,19 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 		null,
 	)
 
-	const [alertDialogOpen, setOpenDeleteAlertDialog] = useState(false)
-	const [tempCourse, setTempCourse] = useState<Course | null>(null)
-
 	const supabase = createClient()
 	const user = useUser()
 	const { toast } = useToast()
+
+	const courseFromPeriodValueToInt = courseFromPeriodValue
+		? Number.parseInt(courseFromPeriodValue)
+		: 0
+	const courseToPeriodValueToInt = courseToPeriodValue
+		? Number.parseInt(courseToPeriodValue)
+		: 0
+	const courseDayIndexValueToInt = Number.parseInt(courseDayIndexValue)
+	const dialogContentClassName =
+		"max-w-[90vw] max-h-[calc(100dvh)] overflow-auto rounded-lg"
 
 	const handleAddCourseSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -72,14 +61,6 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 				description: "Please enter a valid room number",
 			})
 		}
-
-		const courseFromPeriodValueToInt = courseFromPeriodValue
-			? Number.parseInt(courseFromPeriodValue)
-			: 0
-		const courseToPeriodValueToInt = courseToPeriodValue
-			? Number.parseInt(courseToPeriodValue)
-			: 0
-		const courseDayIndexValueToInt = Number.parseInt(courseDayIndexValue)
 
 		const { error } = await supabase.from("course").insert([
 			{
@@ -155,6 +136,7 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 					? Number.parseInt(courseToPeriodValue)
 					: tempCourse?.to_period,
 				day_index: Number.parseInt(courseDayIndexValue),
+				time_notation: courseFromPeriodValueToInt >= 6 ? "PM" : "AM",
 			})
 			.eq("id", tempCourse?.id)
 			.select()
@@ -184,6 +166,7 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 			.from("course")
 			.select("*")
 			.eq("user_id", queryUserId)
+			.order("day_index", { ascending: true })
 
 		if (data) setCourses(data)
 		if (error)
@@ -206,7 +189,7 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 		setOpenEditCourseForm(false)
 	}
 
-	const groupedCourses = courses.reduce<Record<number, Course[]>>(
+	const coursesGroupedByDayIndex = courses.reduce<Record<number, Course[]>>(
 		(acc, course) => {
 			if (!acc[course.day_index]) {
 				acc[course.day_index] = []
@@ -217,37 +200,38 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 		{},
 	)
 
-	console.log(groupedCourses)
-
 	return (
 		<>
-			{/* <div className="w-screen flex justify-center items-center"> */}
-			{/* 	<Button className="btn btn-active btn-ghost" onClick={fetchUserCourses}> */}
-			{/* 		<RefreshCcw /> */}
-			{/* 		Refresh courses */}
-			{/* 	</Button> */}
-			{/* </div> */}
 			{user?.id === queryUserId && (
 				<Button
 					variant="default"
 					size="icon"
 					className="fixed right-4 bottom-4 rounded-full shadow-lg"
-					onClick={() => setOpenAddCourseForm(true)}
+					onClick={() => {
+						// Resets the input states
+						setCourseToPeriodValue("0")
+						setCourseFromPeriodValue("0")
+						setCourseDayIndexValue("1")
+						setCourseLabelValue("")
+						setCourseRoomValue("")
+
+						setOpenAddCourseForm(true)
+					}}
 				>
 					<Plus className="h-4 w-4" />
-					<span className="sr-only">Open edit drawer</span>
+					<span className="sr-only">Open add course form</span>
 				</Button>
 			)}
 			<div className="mt-4 flex flex-col gap-4 p-4">
 				{courses.length > 0 ? (
-					Object.keys(groupedCourses).map((dayIndex) => (
+					Object.keys(coursesGroupedByDayIndex).map((dayIndex) => (
 						<div key={dayIndex} className="flex flex-col gap-2">
 							{/* Group title */}
 							<h2 className="font-bold text-xl">
 								{dayNames[Number.parseInt(dayIndex)]}
 							</h2>
 							{/* Group items */}
-							{groupedCourses[Number.parseInt(dayIndex)]?.map(
+							{coursesGroupedByDayIndex[Number.parseInt(dayIndex)]?.map(
 								(course: Course) => (
 									<div
 										className="flex h-fit w-full flex-col gap-2 rounded-lg border-2 border-black bg-base-100 p-3 shadow-xl"
@@ -302,232 +286,48 @@ export default function UserCourses({ queryUserId }: { queryUserId?: string }) {
 					</div>
 				)}
 			</div>
-			<Dialog open={addCourseFormOpen} onOpenChange={setOpenAddCourseForm}>
-				<DialogContent className="h-screen max-w-screen">
-					<DialogHeader>
-						<DialogTitle className="flex items-center justify-between">
-							Thêm một khóa học
-							<Button
-								variant="outline"
-								onClick={() => {
-									setOpenAddCourseForm(false)
-								}}
-							>
-								<X />
-							</Button>
-						</DialogTitle>
-					</DialogHeader>
 
-					<form
-						className="flex flex-col gap-4"
-						onSubmit={handleAddCourseSubmit}
-					>
-						{/* Course's name */}
-						<Textarea
-							required
-							value={courseLabelValue}
-							onChange={(e) => setCourseLabelValue(e.target.value)}
-							className="max-w-[90vw]"
-							placeholder="Tên của môn học"
-						/>
-						{/* Course's room */}
-						<Input
-							required
-							value={courseRoomValue}
-							onChange={(e) => setCourseRoomValue(e.target.value)}
-							type="text"
-							placeholder="Phòng của môn học"
-						/>
-						{/* Course's day index */}
-						<Select
-							required
-							defaultValue={courseDayIndexValue ? courseDayIndexValue : "1"}
-							onValueChange={(e) => setCourseDayIndexValue(e)}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Ngày học" />
-							</SelectTrigger>
-							<SelectContent>
-								{dayNames.map((day, index) => (
-									<SelectItem
-										key={day + index.toString()}
-										value={index.toString()}
-									>
-										{day}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+			<AddCourseDialog
+				open={addCourseFormOpen}
+				onOpenChange={setOpenAddCourseForm}
+				onSubmit={handleAddCourseSubmit}
+				courseLabelValue={courseLabelValue}
+				setCourseLabelValue={setCourseLabelValue}
+				courseRoomValue={courseRoomValue}
+				setCourseRoomValue={setCourseRoomValue}
+				courseDayIndexValue={courseDayIndexValue}
+				setCourseDayIndexValue={setCourseDayIndexValue}
+				courseFromPeriodValue={courseFromPeriodValue}
+				setCourseFromPeriodValue={setCourseFromPeriodValue}
+				courseToPeriodValue={courseToPeriodValue}
+				setCourseToPeriodValue={setCourseToPeriodValue}
+				contentClassName={dialogContentClassName}
+			/>
 
-						{/* Course's from period */}
-						<Select
-							required
-							defaultValue={courseFromPeriodValue ? courseFromPeriodValue : "1"}
-							onValueChange={(e) => setCourseFromPeriodValue(e)}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Từ tiết" />
-							</SelectTrigger>
-							<SelectContent>
-								{coursePeriods.map((period, index) => (
-									<SelectItem
-										key={period.label + period.start}
-										value={index.toString()}
-									>
-										{period.label} - {period.start}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+			<EditCourseDialog
+				open={editCourseFormOpen}
+				onOpenChange={setOpenEditCourseForm}
+				onSubmit={handleUpdateCourseSubmit}
+				tempCourse={tempCourse}
+				courseLabelValue={courseLabelValue}
+				setCourseLabelValue={setCourseLabelValue}
+				courseRoomValue={courseRoomValue}
+				setCourseRoomValue={setCourseRoomValue}
+				courseDayIndexValue={courseDayIndexValue}
+				setCourseDayIndexValue={setCourseDayIndexValue}
+				courseFromPeriodValue={courseFromPeriodValue}
+				setCourseFromPeriodValue={setCourseFromPeriodValue}
+				courseToPeriodValue={courseToPeriodValue}
+				setCourseToPeriodValue={setCourseToPeriodValue}
+				contentClassName={dialogContentClassName}
+			/>
 
-						{/* Course's to period */}
-						<Select
-							defaultValue={courseToPeriodValue ? courseToPeriodValue : "0"}
-							onValueChange={(e) => setCourseToPeriodValue(e)}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Tới tiết" />
-							</SelectTrigger>
-							<SelectContent>
-								{coursePeriods
-									.slice(1, coursePeriods.length)
-									.map((period, index) => (
-										<SelectItem
-											key={period.label + period.end}
-											value={index.toString()}
-										>
-											{period.label} - {period.end}
-										</SelectItem>
-									))}
-							</SelectContent>
-						</Select>
-
-						<Button className="max-w-[90vw]">Thêm môn học</Button>
-					</form>
-				</DialogContent>
-			</Dialog>
-			<Dialog open={editCourseFormOpen} onOpenChange={setOpenEditCourseForm}>
-				<DialogContent className="h-screen max-w-screen">
-					<DialogHeader>
-						<DialogTitle className="flex items-center justify-between">
-							Chỉnh sửa khóa học
-							<Button
-								variant="outline"
-								onClick={() => {
-									setOpenEditCourseForm(false)
-								}}
-							>
-								<X />
-							</Button>
-						</DialogTitle>
-					</DialogHeader>
-					<form
-						className="flex flex-col gap-4"
-						onSubmit={handleUpdateCourseSubmit}
-					>
-						{/* Course's name edit */}
-						<Textarea
-							required
-							value={courseLabelValue ?? tempCourse?.label}
-							onChange={(e) => setCourseLabelValue(e.target.value)}
-							placeholder="Tên của môn học"
-						/>
-						{/* Course's room edit */}
-						<Input
-							required
-							value={courseRoomValue ?? tempCourse?.room.toUpperCase()}
-							onChange={(e) => setCourseRoomValue(e.target.value)}
-							className="max-w-[90vw]"
-							placeholder="Phòng của môn học"
-						/>
-						{/* Course's day index edit */}
-						<Select
-							required
-							defaultValue={courseDayIndexValue ?? tempCourse?.day_index}
-							onValueChange={(e) => setCourseDayIndexValue(e)}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Ngày hoc" />
-							</SelectTrigger>
-							<SelectContent>
-								{dayNames.map((day, index) => (
-									<SelectItem
-										key={day + index.toString()}
-										value={index.toString()}
-									>
-										{day}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-
-						{/* Course's from period edit */}
-						<Select
-							required
-							defaultValue={
-								courseFromPeriodValue ?? tempCourse?.from_period.toString()
-							}
-							onValueChange={(e) => setCourseFromPeriodValue(e)}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Từ tiết" />
-							</SelectTrigger>
-							<SelectContent>
-								{coursePeriods.map((period, index) => (
-									<SelectItem
-										key={period.label + period.start}
-										value={index.toString()}
-									>
-										{period.label} - {period.start}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						{/* Course's to period edit */}
-						<Select
-							defaultValue={
-								courseToPeriodValue ?? tempCourse?.to_period.toString()
-							}
-							onValueChange={(e) => setCourseToPeriodValue(e)}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Tới tiết" />
-							</SelectTrigger>
-							<SelectContent>
-								{coursePeriods.map((period, index) => (
-									<SelectItem
-										key={period.label + period.end}
-										value={index.toString()}
-									>
-										{period.label} - {period.end}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-
-						<Button>Lưu chỉnh sửa</Button>
-					</form>
-				</DialogContent>
-			</Dialog>
-
-			<AlertDialog
+			<DeleteCourseDialog
 				open={alertDialogOpen}
 				onOpenChange={setOpenDeleteAlertDialog}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Delete this course?</AlertDialogTitle>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel onClick={() => setTempCourse(null)}>
-							Cancel
-						</AlertDialogCancel>
-						<AlertDialogAction onClick={handleDeleteCourse}>
-							Delete
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
+				onDelete={handleDeleteCourse}
+				onCancel={() => setTempCourse(null)}
+			/>
 		</>
 	)
 }
